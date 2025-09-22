@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login - Taller</title>
+  <script type="module">
+    // Importar Firebase desde la CDN
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { 
+      getAuth, 
+      signInWithEmailAndPassword, 
+      sendPasswordResetEmail, 
+      setPersistence, 
+      browserLocalPersistence 
+    } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+
+    // Configuración de Firebase
+    const firebaseConfig = {
+      apiKey: "AIzaSyBA_i9O3vXzFn2rIKY4XQzll2fLvmD-u3A",
+      authDomain: "toperformance-50d5a.firebaseapp.com",
+      databaseURL: "https://toperformance-50d5a-default-rtdb.firebaseio.com",
+      projectId: "toperformance-50d5a",
+      storageBucket: "toperformance-50d5a.appspot.com",
+      messagingSenderId: "1020165964748",
+      appId: "1:1020165964748:web:f05155f982eb4f2eaf9369"
+    };
+
+    // Inicializar Firebase
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+
+    // Iniciar sesión
+    window.login = function() {
+      const email = document.getElementById("email").value;
+      const password = document.getElementById("password").value;
+
+      // Forzar persistencia de sesión
+      setPersistence(auth, browserLocalPersistence).then(() => {
+        return signInWithEmailAndPassword(auth, email, password);
+      })
+      .then((userCredential) => {
+        const user = userCredential.user;
+        // Guardar en localStorage para respaldo
+        localStorage.setItem("userEmail", user.email);
+        localStorage.setItem("userUid", user.uid);
+        window.location.href = "perfil.html";
+      })
+      .catch((error) => {
+        alert("Error al iniciar sesión: " + error.message);
+        console.error(error);
+      });
+    }
+
+    // Recuperar contraseña
+    window.resetPassword = function() {
+      const email = document.getElementById("email").value;
+      if (!email) {
+        alert("Por favor ingresa tu correo para recuperar la contraseña.");
+        return;
+      }
+      sendPasswordResetEmail(auth, email)
+        .then(() => {
+          alert("Se envió un correo de recuperación a " + email);
+        })
+        .catch((error) => {
+          alert("Error al enviar correo: " + error.message);
+          console.error(error);
+        });
+    }
+  </script>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, #ff0000, #000000);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+    .login-box {
+      background: #fff;
+      padding: 30px;
+      border-radius: 15px;
+      text-align: center;
+      width: 320px;
+      box-shadow: 0px 8px 15px rgba(0,0,0,0.3);
+    }
+    .login-box img {
+      width: 120px;
+      margin-bottom: 20px;
+    }
+    .login-box input {
+      width: 100%;
+      padding: 12px;
+      margin: 8px 0;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      font-size: 16px;
+    }
+    .login-box button {
+      width: 100%;
+      padding: 12px;
+      background: #ff0000;
+      border: none;
+      color: white;
+      font-size: 18px;
+      border-radius: 8px;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+    .login-box button:hover {
+      background: #cc0000;
+    }
+    .link {
+      display: block;
+      margin-top: 15px;
+      color: #007BFF;
+      cursor: pointer;
+      text-decoration: underline;
+      font-size: 14px;
+    }
+  </style>
+</head>
+<body>
+  <div class="login-box">
+    <img src="imagenes/logo1.png" alt="Logo Taller">
+    <h2>Iniciar Sesión</h2>
+    <input type="email" id="email" placeholder="Correo">
+    <input type="password" id="password" placeholder="Contraseña">
+    <button onclick="login()">Ingresar</button>
+    <span class="link" onclick="resetPassword()">¿Olvidaste tu contraseña?</span>
+  </div>
+</body>
+</html>
