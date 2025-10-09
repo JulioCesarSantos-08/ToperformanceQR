@@ -1,35 +1,43 @@
 /********************
-  perfil.js
-  - Alta clientes (admin)
-  - Mostrar clientes (admin/cliente)
-  - Mostrar servicios por cliente
-  - Editar / Eliminar cliente
-  - Agregar / Editar / Eliminar servicios
+  perfil.js FINAL 2025 (versión mejorada)
+  - Muestra nombre del cliente en saludo
+  - Historial de servicios tipo tabla con bordes y colores dinámicos de fecha
+  - Totalmente centrado y responsivo
+  - Compatible con admin y usuarios normales
 ********************/
 
+// =========================
 // Importar Firebase
+// =========================
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getDatabase, ref, push, set, get, update, remove, child } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
-import { getAuth, onAuthStateChanged, signOut, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import {
+  getDatabase, ref, push, set, get, update, remove
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+import {
+  getAuth, onAuthStateChanged, signOut, createUserWithEmailAndPassword
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
+// =========================
 // Configuración Firebase
+// =========================
 const firebaseConfig = {
-  apiKey: "TU_API_KEY",
-  authDomain: "TU_PROJECT_ID.firebaseapp.com",
-  databaseURL: "https://TU_PROJECT_ID-default-rtdb.firebaseio.com",
-  projectId: "TU_PROJECT_ID",
-  storageBucket: "TU_PROJECT_ID.appspot.com",
-  messagingSenderId: "NUM",
-  appId: "APP_ID"
+  apiKey: "AIzaSyBA_i9O3vXzFn2rIKY4XQzll2fLvmD-u3A",
+  authDomain: "toperformance-50d5a.firebaseapp.com",
+  databaseURL: "https://toperformance-50d5a-default-rtdb.firebaseio.com",
+  projectId: "toperformance-50d5a",
+  storageBucket: "toperformance-50d5a.appspot.com",
+  messagingSenderId: "1020165964748",
+  appId: "1:1020165964748:web:f05155f982eb4f2eaf9369"
 };
 
-// Inicializar
+// =========================
+// Inicialización
+// =========================
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 const auth = getAuth(app);
 
 const contenidoDiv = document.getElementById("contenido");
-const serviciosDiv = document.getElementById("servicios");
 const adminForm = document.getElementById("adminForm");
 
 let usuarioActual = null;
@@ -42,30 +50,74 @@ let clienteEditandoKey = null;
 onAuthStateChanged(auth, async (user) => {
   if (user) {
     usuarioActual = user;
-    document.getElementById("bienvenido").innerText = "Bienvenido: " + user.email;
 
-    if (user.email === "admin@gmail.com") {
+    if (user.email === "admin@gmail.com" || user.email === "ti43300@uvp.edu.mx") {
       esAdmin = true;
       adminForm.style.display = "block";
+      document.getElementById("bienvenido").innerText = "Panel de Administración";
       cargarTodosClientes();
     } else {
       esAdmin = false;
       adminForm.style.display = "none";
-      cargarCliente(user.email.replace(/\./g, "_"));
+      await buscarClientePorCorreo(user.email);
     }
   } else {
-    window.location.href = "perfil.html";
+    window.location.href = "index.html";
   }
 });
 
+// =========================
+// Buscar cliente por correo
+// =========================
+async function buscarClientePorCorreo(correo) {
+  const key = correo.replace(/[.#$[\]@]/g, "_");
+  const refCliente = ref(db, "clientes/" + key);
+  const snap = await get(refCliente);
+
+  if (snap.exists()) {
+    const cliente = snap.val();
+    document.getElementById("bienvenido").innerText = `Bienvenido, ${cliente.nombre}`;
+    mostrarCliente(key, cliente);
+    return;
+  }
+
+  // Buscar entre todos los clientes
+  const allSnap = await get(ref(db, "clientes"));
+  if (allSnap.exists()) {
+    let encontrado = null, k = null;
+    allSnap.forEach(c => {
+      if (c.val().email === correo) {
+        encontrado = c.val();
+        k = c.key;
+      }
+    });
+    if (encontrado) {
+      document.getElementById("bienvenido").innerText = `Bienvenido, ${encontrado.nombre}`;
+      mostrarCliente(k, encontrado);
+      return;
+    }
+  }
+
+  document.getElementById("bienvenido").innerText = "Bienvenido";
+  contenidoDiv.innerHTML = "<p>No se encontraron datos de tu cuenta.</p>";
+}
+
+// =========================
+// Cerrar sesión
+// =========================
 window.logout = function() {
-  signOut(auth);
+  signOut(auth).then(() => {
+    localStorage.clear();
+    window.location.href = "index.html";
+  });
 };
 
 // =========================
-// Alta cliente
+// Alta cliente (solo admin)
 // =========================
 window.altaCliente = async function() {
+  if (!esAdmin) return;
+
   const nombre = document.getElementById("nombre").value.trim();
   const correo = document.getElementById("correo").value.trim();
   const password = document.getElementById("password").value.trim();
@@ -74,43 +126,40 @@ window.altaCliente = async function() {
   const imagen = document.getElementById("imagen").value.trim();
 
   if (!nombre || !correo || !modelo || !placa) {
-    alert("Faltan datos");
+    alert("Por favor completa todos los campos requeridos.");
     return;
   }
 
-  const key = correo.replace(/\./g, "_");
+  const key = correo.replace(/[.#$[\]@]/g, "_");
 
   if (password) {
     try {
       await createUserWithEmailAndPassword(auth, correo, password);
-      alert("Usuario creado en Auth");
+      alert("Usuario creado en Firebase Authentication.");
     } catch (err) {
-      console.warn("No se pudo crear en Auth:", err.message);
+      console.warn("Error creando usuario en Auth:", err.message);
     }
   }
 
   await set(ref(db, "clientes/" + key), {
-    nombre, email: correo, vehiculo: { modelo, placa, imagen }
+    nombre,
+    email: correo,
+    vehiculo: { modelo, placa, imagen: imagen || "defaultcar.png" }
   });
 
-  alert("Cliente guardado");
-  document.getElementById("nombre").value = "";
-  document.getElementById("correo").value = "";
-  document.getElementById("password").value = "";
-  document.getElementById("modelo").value = "";
-  document.getElementById("placa").value = "";
-  document.getElementById("imagen").value = "";
-
+  alert("Cliente guardado correctamente.");
+  document.getElementById("adminForm").reset();
   cargarTodosClientes();
 };
 
 // =========================
-// Cargar datos
+// Cargar clientes
 // =========================
 async function cargarCliente(key) {
   const snap = await get(ref(db, "clientes/" + key));
+  contenidoDiv.innerHTML = "";
   if (!snap.exists()) {
-    contenidoDiv.innerHTML = "<p>No hay datos de este cliente</p>";
+    contenidoDiv.innerHTML = "<p>No hay datos de este cliente.</p>";
     return;
   }
   mostrarCliente(snap.key, snap.val());
@@ -120,30 +169,38 @@ async function cargarTodosClientes() {
   const snap = await get(ref(db, "clientes"));
   contenidoDiv.innerHTML = "";
   if (!snap.exists()) {
-    contenidoDiv.innerHTML = "<p>No hay clientes</p>";
+    contenidoDiv.innerHTML = "<p>No hay clientes registrados.</p>";
     return;
   }
   snap.forEach(c => mostrarCliente(c.key, c.val()));
 }
 
+// =========================
+// Mostrar cliente + servicios
+// =========================
 function mostrarCliente(key, cliente) {
   const div = document.createElement("div");
   div.classList.add("cliente-card");
+  div.style.margin = "auto"; // Centrado
+  div.style.maxWidth = "900px"; // Ancho máximo
+
   div.innerHTML = `
     <h3>${cliente.nombre}</h3>
     <p><b>Email:</b> ${cliente.email}</p>
     <p><b>Vehículo:</b> ${cliente.vehiculo.modelo} (${cliente.vehiculo.placa})</p>
-    <img src="imagenes/${cliente.vehiculo.imagen}" alt="Auto" style="max-width:200px">
-    <div id="servicios-${key}"></div>
+    <img src="imagenes/${cliente.vehiculo.imagen}" alt="Auto del cliente" 
+      style="max-width:100%; border-radius:10px; margin:10px 0;">
+    <div id="servicios-${key}" class="servicios-section"></div>
   `;
 
   if (esAdmin) {
     const btnEditar = document.createElement("button");
-    btnEditar.innerText = "Editar";
+    btnEditar.innerText = "Editar Cliente";
     btnEditar.onclick = () => editarCliente(key, cliente);
 
     const btnEliminar = document.createElement("button");
-    btnEliminar.innerText = "Eliminar";
+    btnEliminar.innerText = "Eliminar Cliente";
+    btnEliminar.classList.add("danger");
     btnEliminar.onclick = () => eliminarCliente(key);
 
     div.appendChild(btnEditar);
@@ -155,35 +212,67 @@ function mostrarCliente(key, cliente) {
 }
 
 // =========================
-// Servicios
+// Tabla con color dinámico de fecha
+// =========================
+function calcularColorFecha(fechaStr) {
+  if (!fechaStr) return "#ccc";
+
+  const fecha = new Date(fechaStr);
+  const hoy = new Date();
+  const diffDias = (hoy - fecha) / (1000 * 60 * 60 * 24);
+
+  if (diffDias <= 30) return "green";      // menos de 1 mes
+  if (diffDias <= 60) return "orange";     // 1 a 2 meses
+  return "red";                            // más de 2 meses
+}
+
+// =========================
+// Servicios del cliente
 // =========================
 async function cargarServicios(clienteKey) {
   const cont = document.getElementById("servicios-" + clienteKey);
   const snap = await get(ref(db, "clientes/" + clienteKey + "/servicios"));
-  cont.innerHTML = "<h4>Servicios</h4>";
+  cont.innerHTML = `<h4>🧰 Historial de servicios</h4>`;
 
   if (!snap.exists()) {
-    cont.innerHTML += "<p>No hay servicios</p>";
-    return;
-  }
+    cont.innerHTML += "<p>No hay servicios registrados.</p>";
+  } else {
+    const tabla = document.createElement("table");
+    tabla.classList.add("tabla-servicios");
+    tabla.style.borderCollapse = "collapse";
+    tabla.style.width = "100%";
+    tabla.style.marginTop = "10px";
 
-  snap.forEach(s => {
-    const serv = s.val();
-    const div = document.createElement("div");
-    div.classList.add("servicio-card");
-    div.innerHTML = `
-      <p><b>Fecha:</b> ${serv.fecha}</p>
-      <p><b>Descripción:</b> ${serv.descripcion}</p>
-      <p><b>Costo:</b> $${serv.costo}</p>
+    tabla.innerHTML = `
+      <thead style="background:#d00000; color:white;">
+        <tr>
+          <th style="border:1px solid #ccc; padding:8px;">📅 Fecha</th>
+          <th style="border:1px solid #ccc; padding:8px;">🔧 Servicio</th>
+          <th style="border:1px solid #ccc; padding:8px;">🧾 Descripción</th>
+          <th style="border:1px solid #ccc; padding:8px;">💲 Costo</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
     `;
-    if (esAdmin) {
-      const btnEliminar = document.createElement("button");
-      btnEliminar.innerText = "Eliminar Servicio";
-      btnEliminar.onclick = () => eliminarServicio(clienteKey, s.key);
-      div.appendChild(btnEliminar);
-    }
-    cont.appendChild(div);
-  });
+
+    const tbody = tabla.querySelector("tbody");
+    snap.forEach(s => {
+      const serv = s.val();
+      const fila = document.createElement("tr");
+      const colorFecha = calcularColorFecha(serv.fecha);
+      fila.innerHTML = `
+        <td style="border:1px solid #ccc; padding:8px; color:${colorFecha}; font-weight:600;">
+          ${serv.fecha || "-"}
+        </td>
+        <td style="border:1px solid #ccc; padding:8px;">${serv.nombre || "Sin nombre"}</td>
+        <td style="border:1px solid #ccc; padding:8px;">${serv.descripcion || "-"}</td>
+        <td style="border:1px solid #ccc; padding:8px;">$${serv.costo || "0"}</td>
+      `;
+      tbody.appendChild(fila);
+    });
+
+    cont.appendChild(tabla);
+  }
 
   if (esAdmin) {
     const btnNuevo = document.createElement("button");
@@ -193,22 +282,22 @@ async function cargarServicios(clienteKey) {
   }
 }
 
+// =========================
+// Agregar servicio (admin)
+// =========================
 async function agregarServicio(clienteKey) {
-  const fecha = prompt("Fecha del servicio:");
-  const descripcion = prompt("Descripción:");
-  const costo = prompt("Costo:");
+  const nombre = prompt("Nombre del servicio:");
+  const fecha = prompt("Fecha del servicio (YYYY-MM-DD):");
+  const descripcion = prompt("Descripción del servicio:");
+  const costo = prompt("Costo del servicio:");
 
-  if (!fecha || !descripcion || !costo) return;
+  if (!nombre || !fecha || !descripcion || !costo) return;
 
-  await push(ref(db, "clientes/" + clienteKey + "/servicios"), { fecha, descripcion, costo });
+  await push(ref(db, "clientes/" + clienteKey + "/servicios"), {
+    nombre, fecha, descripcion, costo
+  });
+
   cargarServicios(clienteKey);
-}
-
-async function eliminarServicio(clienteKey, servicioKey) {
-  if (confirm("¿Eliminar servicio?")) {
-    await remove(ref(db, "clientes/" + clienteKey + "/servicios/" + servicioKey));
-    cargarServicios(clienteKey);
-  }
 }
 
 // =========================
@@ -221,7 +310,6 @@ function editarCliente(key, cliente) {
   document.getElementById("editModelo").value = cliente.vehiculo.modelo;
   document.getElementById("editPlaca").value = cliente.vehiculo.placa;
   document.getElementById("editImagen").value = cliente.vehiculo.imagen;
-
   document.getElementById("modalEditar").style.display = "flex";
 }
 
@@ -239,7 +327,7 @@ window.guardarEdicionCliente = async function(event) {
     nombre, email, vehiculo: { modelo, placa, imagen }
   });
 
-  alert("Cliente actualizado");
+  alert("Cliente actualizado correctamente.");
   document.getElementById("modalEditar").style.display = "none";
   clienteEditandoKey = null;
   cargarTodosClientes();
@@ -251,7 +339,7 @@ window.closeModal = function() {
 };
 
 async function eliminarCliente(key) {
-  if (confirm("¿Eliminar cliente y sus servicios?")) {
+  if (confirm("¿Eliminar este cliente y su historial de servicios?")) {
     await remove(ref(db, "clientes/" + key));
     cargarTodosClientes();
   }
