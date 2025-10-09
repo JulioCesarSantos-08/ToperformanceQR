@@ -1,0 +1,258 @@
+body {
+  font-family: Arial, sans-serif;
+  background: #f4f4f4;
+  margin: 0;
+}
+
+/* --- ENCABEZADO --- */
+.header {
+  background: #d00000;
+  color: white;
+  padding: 15px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.user-bar button {
+  background: black;
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.user-bar button:hover {
+  background: #333;
+}
+
+/* --- CONTENEDORES --- */
+.contenedor {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 20px;
+  padding: 20px;
+}
+
+.card {
+  background: white;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0px 2px 6px rgba(0,0,0,0.2);
+}
+
+.card input,
+.card textarea,
+.card select {
+  display: block;
+  width: 100%;
+  margin: 8px 0;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 15px;
+}
+
+.card button {
+  background: #d00000;
+  color: white;
+  border: none;
+  padding: 10px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  width: 100%;
+  font-weight: bold;
+}
+
+.card button:hover {
+  background: #a00000;
+}
+
+/* --- TARJETAS DE CLIENTES --- */
+.cliente-card {
+  background: #f9f9f9;
+  padding: 10px;
+  border-radius: 8px;
+  margin-bottom: 10px;
+  border: 1px solid #ddd;
+}
+
+.cliente-card h4,
+.cliente-card h3 {
+  margin: 0 0 6px 0;
+  color: #d00000;
+}
+
+/* --- BOTONES DE ACCIÓN --- */
+.btns {
+  display: flex;
+  gap: 6px;
+  margin-top: 10px;
+}
+
+.btns button {
+  flex: 1;
+  padding: 8px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  color: white;
+  font-weight: bold;
+  transition: background 0.2s ease;
+}
+
+.btns button:hover {
+  opacity: 0.9;
+}
+
+.btns .danger {
+  background: #444;
+}
+
+.btns .info {
+  background: #0084ff;
+}
+
+/* --- FORMULARIO DE EDICIÓN --- */
+.editar-form {
+  max-width: 500px;
+  margin: 30px auto;
+  background: white;
+  padding: 25px;
+  border-radius: 12px;
+  box-shadow: 0 3px 8px rgba(0,0,0,0.2);
+}
+
+.editar-form h2 {
+  text-align: center;
+  color: #d00000;
+  margin-bottom: 15px;
+}
+
+.editar-form label {
+  display: block;
+  margin: 10px 0 5px;
+  font-weight: bold;
+  color: #333;
+}
+
+.editar-form input {
+  width: 100%;
+  padding: 10px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  font-size: 15px;
+}
+
+.editar-form .botones {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.editar-form button {
+  flex: 1;
+  background: #d00000;
+  color: white;
+  border: none;
+  padding: 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.editar-form button.cancelar {
+  background: #555;
+}
+
+.editar-form button:hover {
+  opacity: 0.9;
+}
+
+/* --- MODAL DE INFORMACIÓN --- */
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 100;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.6);
+  justify-content: center;
+  align-items: center;
+}
+
+.modal-content {
+  background: #fff;
+  padding: 25px;
+  border-radius: 12px;
+  width: 90%;
+  max-width: 700px;
+  box-shadow: 0 3px 10px rgba(0,0,0,0.3);
+  overflow-y: auto;
+  max-height: 90vh;
+}
+
+.close {
+  float: right;
+  font-size: 26px;
+  cursor: pointer;
+}
+
+.close:hover {
+  color: #d00000;
+}
+
+/* --- TABLA DE SERVICIOS --- */
+.tabla-servicios {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+}
+
+.tabla-servicios th,
+.tabla-servicios td {
+  border: 1px solid #ccc;
+  padding: 8px;
+  text-align: left;
+}
+
+.tabla-servicios th {
+  background: #d00000;
+  color: white;
+}
+
+.tabla-servicios tr:nth-child(even) {
+  background: #f9f9f9;
+}
+
+/* --- RESPONSIVE --- */
+@media (max-width: 900px) {
+  .contenedor {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 600px) {
+  .editar-form {
+    margin: 20px;
+    padding: 20px;
+  }
+
+  .editar-form h2 {
+    font-size: 20px;
+  }
+
+  .editar-form button {
+    font-size: 14px;
+    padding: 8px;
+  }
+
+  .modal-content {
+    width: 95%;
+    padding: 20px;
+  }
+}
