@@ -65,6 +65,22 @@ body {
   border: 1px solid #ddd;
 }
 
+/* Botón nuevo servicio */
+#btnNuevoServicio {
+  background: green;
+  color: white;
+  border: none;
+  padding: 10px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.95rem;
+  margin-top: 10px;
+}
+
+#btnNuevoServicio:hover {
+  background: darkgreen;
+}
+
 /* Responsivo */
 @media (max-width: 768px) {
   .contenedor {
