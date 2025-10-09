@@ -1,281 +1,67 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Perfil - Taller</title>
-
-  <script type="module">
-    import { initializeApp, getApp, getApps, deleteApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-    import {
-      getAuth,
-      onAuthStateChanged,
-      signOut,
-      createUserWithEmailAndPassword,
-      setPersistence,
-      inMemoryPersistence
-    } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-    import { getDatabase, ref, get, child, set } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
-
-    // -----------------------
-    // CONFIGURACIÓN FIREBASE
-    // -----------------------
-    const firebaseConfig = {
-      apiKey: "AIzaSyBA_i9O3vXzFn2rIKY4XQzll2fLvmD-u3A",
-      authDomain: "toperformance-50d5a.firebaseapp.com",
-      databaseURL: "https://toperformance-50d5a-default-rtdb.firebaseio.com",
-      projectId: "toperformance-50d5a",
-      storageBucket: "toperformance-50d5a.appspot.com",
-      messagingSenderId: "1020165964748",
-      appId: "1:1020165964748:web:f05155f982eb4f2eaf9369"
-    };
-
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db = getDatabase(app);
-
-    // Correos de administradores
-    const admins = ["ti43300@uvp.edu.mx"];
-
-    // -----------------------
-    // RESPALDO LOCALSTORAGE
-    // -----------------------
-    const backupUid = localStorage.getItem("userUid");
-    const backupEmail = localStorage.getItem("userEmail");
-    if (backupUid && backupEmail) {
-      // Muestra datos rápido mientras Auth sincroniza
-      if (admins.includes(backupEmail)) {
-        document.addEventListener("DOMContentLoaded", () => {
-          document.getElementById("titulo").innerText = "Panel de Administrador";
-          document.getElementById("adminForm").style.display = "block";
-          cargarTodosClientes();
-        });
-      } else {
-        document.addEventListener("DOMContentLoaded", async () => {
-          document.getElementById("titulo").innerText = "Mi Vehículo";
-          await cargarMiClientePorUidEmail(backupUid, backupEmail);
-        });
-      }
-    }
-
-    // -----------------------
-    // ESTADO DE AUTENTICACIÓN
-    // -----------------------
-    onAuthStateChanged(auth, async (user) => {
-      if (!user) {
-        window.location.href = "index.html";
-        return;
-      }
-
-      const email = user.email || localStorage.getItem("userEmail");
-      localStorage.setItem("userEmail", email);
-      localStorage.setItem("userUid", user.uid);
-
-      if (admins.includes(email)) {
-        document.getElementById("titulo").innerText = "Panel de Administrador";
-        document.getElementById("adminForm").style.display = "block";
-        cargarTodosClientes();
-      } else {
-        document.getElementById("titulo").innerText = "Mi Vehículo";
-        await cargarMiClientePorUidEmail(user.uid, email);
-      }
-    });
-
-    // -----------------------
-    // FUNCIONES DE LECTURA DB
-    // -----------------------
-    async function cargarMiClientePorUidEmail(uid, email) {
-      const dbRef = ref(db);
-
-      // 1) Probar por UID
-      let snapshot = await get(child(dbRef, "clientes/" + uid));
-      if (snapshot.exists()) {
-        mostrarClienteConBienvenida(snapshot.val());
-        return;
-      }
-
-      // 2) Probar por email modificado
-      const emailKey = email.replace(/[.@]/g, "_");
-      snapshot = await get(child(dbRef, "clientes/" + emailKey));
-      if (snapshot.exists()) {
-        mostrarClienteConBienvenida(snapshot.val());
-        return;
-      }
-
-      // 3) Buscar recorriendo todos
-      snapshot = await get(child(dbRef, "clientes"));
-      if (snapshot.exists()) {
-        const clientes = snapshot.val();
-        for (const k in clientes) {
-          if (clientes[k] && clientes[k].email === email) {
-            mostrarClienteConBienvenida(clientes[k]);
-            return;
-          }
-        }
-      }
-
-      document.getElementById("contenido").innerHTML = "<p>No se encontró información de tu vehículo. Contacta al taller.</p>";
-    }
-
-    function mostrarClienteConBienvenida(data) {
-      const welcomeEl = document.getElementById("bienvenido");
-      if (welcomeEl) welcomeEl.innerText = `Bienvenido, ${data.nombre}`;
-
-      const cont = document.getElementById("contenido");
-      cont.innerHTML = "";
-      const card = document.createElement("div");
-      card.className = "card";
-      card.innerHTML = `
-        <h3>${data.nombre}</h3>
-        <p><strong>Email:</strong> ${data.email}</p>
-        <p><strong>Vehículo:</strong> ${data.vehiculo.modelo} (${data.vehiculo.placa})</p>
-        <img src="imagenes/${data.vehiculo.imagen}" alt="Auto de ${data.nombre}">
-      `;
-      cont.appendChild(card);
-    }
-
-    async function cargarTodosClientes() {
-      const dbRef = ref(db);
-      const snapshot = await get(child(dbRef, "clientes"));
-      const cont = document.getElementById("contenido");
-      cont.innerHTML = "";
-      if (!snapshot.exists()) {
-        cont.innerHTML = "<p>No hay clientes registrados.</p>";
-        return;
-      }
-      const clientes = snapshot.val();
-      for (const key in clientes) {
-        if (clientes[key]) {
-          const c = clientes[key];
-          const card = document.createElement("div");
-          card.className = "card";
-          card.innerHTML = `
-            <h3>${c.nombre}</h3>
-            <p><strong>Email:</strong> ${c.email}</p>
-            <p><strong>Vehículo:</strong> ${c.vehiculo.modelo} (${c.vehiculo.placa})</p>
-            <img src="imagenes/${c.vehiculo.imagen}" alt="Auto de ${c.nombre}">
-          `;
-          cont.appendChild(card);
-        }
-      }
-    }
-
-    // -----------------------
-    // ALTA DE CLIENTE (ADMIN)
-    // -----------------------
-    window.altaCliente = async function() {
-      const nombre = document.getElementById("nombre").value.trim();
-      const email = document.getElementById("correo").value.trim();
-      const password = document.getElementById("password").value;
-      const modelo = document.getElementById("modelo").value.trim();
-      const placa = document.getElementById("placa").value.trim();
-      const imagen = document.getElementById("imagen").value.trim();
-
-      if (!nombre || !email || !modelo || !placa || !imagen) {
-        alert("Por favor completa todos los campos.");
-        return;
-      }
-
-      const emailKey = email.replace(/[.@]/g, "_");
-      const clienteData = { nombre, email, vehiculo: { modelo, placa, imagen } };
-
-      if (password) {
-        try {
-          let secondaryApp;
-          try {
-            secondaryApp = getApp("secondary");
-          } catch {
-            secondaryApp = initializeApp(firebaseConfig, "secondary");
-          }
-          const tempAuth = getAuth(secondaryApp);
-          await setPersistence(tempAuth, inMemoryPersistence);
-
-          const uc = await createUserWithEmailAndPassword(tempAuth, email, password);
-          const uid = uc.user.uid;
-
-          await set(ref(db, `clientes/${uid}`), clienteData);
-          await set(ref(db, `clientes/${emailKey}`), clienteData);
-
-          alert("Cliente agregado correctamente.");
-          try { await deleteApp(secondaryApp); } catch {}
-          location.reload();
-          return;
-        } catch (err) {
-          if (err.code === "auth/email-already-in-use") {
-            await set(ref(db, `clientes/${emailKey}`), clienteData);
-            alert("El usuario ya existe en Auth. Se guardó en la base de datos.");
-            location.reload();
-            return;
-          }
-          alert("Error creando usuario: " + err.message);
-          return;
-        }
-      } else {
-        await set(ref(db, `clientes/${emailKey}`), clienteData)
-          .then(() => {
-            alert("Cliente agregado en base de datos.");
-            location.reload();
-          })
-          .catch((err) => alert("Error: " + err.message));
-      }
-    };
-
-    // -----------------------
-    // LOGOUT
-    // -----------------------
-    window.logout = function() {
-      signOut(auth).then(() => {
-        localStorage.removeItem("userEmail");
-        localStorage.removeItem("userUid");
-        window.location.href = "login.html";
-      });
-    };
-  </script>
-
-  <style>
-    body { font-family: 'Segoe UI', sans-serif; margin:0; background:#f4f4f9; }
-    header { background:#ff0000; color:white; padding:15px; display:flex; align-items:center; justify-content:space-between; gap:12px }
-    header img { height:50px; }
-    header .header-right { display:flex; align-items:center; gap:12px; }
-    #bienvenido { font-weight:600; }
-    .container { padding:20px; }
-    .card { background:#fff; border-radius:12px; padding:20px; margin-bottom:20px; box-shadow:0 4px 10px rgba(0,0,0,0.12) }
-    .card img { width:100%; max-width:300px; border-radius:10px; margin-top:10px }
-    button { background:#000; color:white; padding:10px 20px; border:none; border-radius:8px; cursor:pointer }
-    button:hover { background:#333 }
-    #adminForm { display:none; background:#fff; padding:20px; margin:20px 0; border-radius:12px; box-shadow:0 4px 10px rgba(0,0,0,0.12) }
-    #adminForm input { display:block; width:100%; padding:10px; margin:8px 0; border:1px solid #ccc; border-radius:6px }
-  </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Perfil - ToPerformance</title>
+  <link rel="stylesheet" href="perfil.css">
 </head>
 <body>
   <header>
-    <div>
-      <h1 id="titulo">Perfil</h1>
-      <div id="bienvenido" aria-live="polite" style="font-size:1rem; opacity:0.95"></div>
-    </div>
-
-    <div class="header-right">
+    <div class="header-left">
       <img src="imagenes/logo1.png" alt="Logo Taller">
-      <button onclick="logout()">Cerrar Sesión</button>
+      <h1>ToPerformance</h1>
+    </div>
+    <div class="header-right">
+      <span id="bienvenido">Bienvenido</span>
+      <button onclick="logout()">Cerrar sesión</button>
     </div>
   </header>
 
-  <div class="container">
-    <div id="adminForm">
-      <h2>Dar de Alta Cliente</h2>
-      <input type="text" id="nombre" placeholder="Nombre del cliente">
-      <input type="email" id="correo" placeholder="Correo">
-      <input type="password" id="password" placeholder="Contraseña del cliente (opcional)">
-      <input type="text" id="modelo" placeholder="Modelo del vehículo">
-      <input type="text" id="placa" placeholder="Placa">
-      <input type="text" id="imagen" placeholder="Nombre de la imagen (ej. autodejuan.png)">
-      <button onclick="altaCliente()">Guardar Cliente</button>
-      <p style="font-size:0.9rem;color:#666;margin-top:8px">
-        Nota: si pones contraseña, el sistema intentará crear la cuenta en Auth sin persistir la sesión del nuevo usuario.
-      </p>
-    </div>
+  <main class="container">
+    <!-- =========================
+         Panel de administración
+    ========================== -->
+    <section id="panelAdmin">
+      <form id="adminForm">
+        <h2>Registrar Cliente</h2>
+        <input type="text" id="nombre" placeholder="Nombre completo" required>
+        <input type="email" id="correo" placeholder="Correo electrónico" required>
+        <input type="password" id="password" placeholder="Contraseña (opcional)">
+        <input type="text" id="modelo" placeholder="Modelo del vehículo" required>
+        <input type="text" id="placa" placeholder="Placa del vehículo" required>
+        <input type="text" id="imagen" placeholder="Nombre del archivo de imagen (opcional)">
+        <button type="button" onclick="altaCliente()">Guardar Cliente</button>
+        <p class="nota">* Solo el administrador puede registrar nuevos clientes.</p>
+      </form>
+    </section>
 
-    <div id="contenido"></div>
+    <!-- =========================
+         Contenido dinámico
+    ========================== -->
+    <section id="contenido"></section>
+  </main>
+
+  <!-- =========================
+       Modal de edición
+  ========================== -->
+  <div id="modalEditar" class="modal">
+    <div class="modal-content">
+      <h2>Editar Cliente</h2>
+      <form id="editForm" onsubmit="guardarEdicionCliente(event)">
+        <input type="text" id="editNombre" placeholder="Nombre">
+        <input type="email" id="editCorreo" placeholder="Correo">
+        <input type="text" id="editModelo" placeholder="Modelo">
+        <input type="text" id="editPlaca" placeholder="Placa">
+        <input type="text" id="editImagen" placeholder="Imagen">
+        <div class="modal-actions">
+          <button type="submit">Guardar</button>
+          <button type="button" onclick="closeModal()">Cancelar</button>
+        </div>
+      </form>
+    </div>
   </div>
+
+  <script type="module" src="perfil.js"></script>
 </body>
 </html>
