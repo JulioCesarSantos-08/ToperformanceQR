@@ -3,27 +3,31 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Login - Taller</title>
+  <title>Login - Taller ToPerformance</title>
 
   <style>
+    /* === Fondo general === */
     body {
+      margin: 0;
       font-family: 'Segoe UI', sans-serif;
-      background: linear-gradient(135deg, #ff0000, #000000);
+      background: linear-gradient(to right, #8B0000, #400000);
       display: flex;
+      flex-direction: column;
       justify-content: center;
       align-items: center;
-      height: 100vh;
-      margin: 0;
+      min-height: 100vh;
+      padding: 20px;
     }
 
+    /* === Caja principal de login === */
     .login-box {
       background: #fff;
-      padding: 30px 25px;
+      padding: 35px 30px;
       border-radius: 15px;
       text-align: center;
-      width: 90%;
-      max-width: 340px;
-      box-shadow: 0 8px 20px rgba(0,0,0,0.25);
+      width: 100%;
+      max-width: 400px;
+      box-shadow: 0 8px 25px rgba(0,0,0,0.3);
       animation: fadeIn 0.5s ease;
     }
 
@@ -33,7 +37,9 @@
     }
 
     .login-box img {
-      width: 110px;
+      width: 90px;
+      height: 90px;
+      border-radius: 50%;
       margin-bottom: 15px;
     }
 
@@ -43,63 +49,122 @@
       font-size: 22px;
     }
 
+    /* === Campos de texto === */
     .login-box input {
       width: 100%;
+      max-width: 340px;
       padding: 12px;
       margin: 8px 0;
       border-radius: 8px;
       border: 1px solid #ccc;
-      font-size: 16px;
-      transition: border 0.3s;
+      font-size: 15px;
+      background: #f6f7fb;
+      transition: all 0.3s;
     }
 
     .login-box input:focus {
       outline: none;
-      border-color: #ff0000;
+      border-color: #d00000;
+      box-shadow: 0 0 4px rgba(208, 0, 0, 0.5);
     }
 
+    /* === Botón principal === */
     .login-box button {
       width: 100%;
+      max-width: 340px;
       padding: 12px;
-      background: #ff0000;
+      background: #d00000;
       border: none;
       color: #fff;
-      font-size: 18px;
+      font-size: 17px;
       border-radius: 8px;
       cursor: pointer;
       margin-top: 10px;
       transition: background 0.3s;
+      font-weight: bold;
     }
 
     .login-box button:hover {
-      background: #cc0000;
+      background: #a00000;
     }
 
+    /* === Enlace de recuperación === */
     .link {
       display: block;
       margin-top: 15px;
-      color: #007BFF;
+      color: #0047ff;
       cursor: pointer;
       text-decoration: underline;
       font-size: 14px;
     }
 
-    /* 🔹 Diseño responsivo */
-    @media (max-width: 480px) {
-      body {
-        padding: 15px;
-      }
+    .link:hover {
+      color: #001fa3;
+    }
+
+    /* === Sección de publicidad === */
+    .promo-box {
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 12px;
+      padding: 20px;
+      color: white;
+      width: 100%;
+      max-width: 400px;
+      text-align: center;
+      margin-top: 25px;
+      box-shadow: 0 3px 12px rgba(0,0,0,0.3);
+    }
+
+    .promo-box h3 {
+      font-size: 18px;
+      margin-bottom: 10px;
+      color: #fff;
+    }
+
+    .promo-box p {
+      font-size: 14px;
+      margin-bottom: 15px;
+    }
+
+    .promo-box a {
+      display: inline-block;
+      padding: 10px 18px;
+      background: #ff0000;
+      color: white;
+      border-radius: 6px;
+      font-weight: bold;
+      text-decoration: none;
+      transition: background 0.3s;
+    }
+
+    .promo-box a:hover {
+      background: #a00000;
+    }
+
+    /* === Responsivo === */
+    @media (max-width: 600px) {
       .login-box {
         padding: 25px 20px;
       }
+
       .login-box h2 {
         font-size: 20px;
+      }
+
+      .promo-box {
+        padding: 15px;
+      }
+
+      .login-box input,
+      .login-box button {
+        max-width: 100%;
       }
     }
   </style>
 </head>
 
 <body>
+  <!-- Caja principal de login -->
   <div class="login-box">
     <img src="imagenes/logo1.png" alt="Logo Taller">
     <h2>Iniciar Sesión</h2>
@@ -107,6 +172,13 @@
     <input type="password" id="password" placeholder="Contraseña">
     <button onclick="login()">Ingresar</button>
     <span class="link" onclick="resetPassword()">¿Olvidaste tu contraseña?</span>
+  </div>
+
+  <!-- Publicidad / Página oficial -->
+  <div class="promo-box">
+    <h3>🌐 Visita nuestra página oficial</h3>
+    <p>Conoce más sobre nuestros servicios y promociones.</p>
+    <a href="https://toperformance.vercel.app/index.html#inicio" target="_blank">Ir a ToPerformance</a>
   </div>
 
   <script type="module">
@@ -133,9 +205,7 @@
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
 
-    // ============================
-    // 🔐 Función: Iniciar Sesión
-    // ============================
+    // 🔐 Iniciar sesión
     window.login = async function() {
       const email = document.getElementById("email").value.trim();
       const password = document.getElementById("password").value.trim();
@@ -150,12 +220,10 @@
         const userCredential = await signInWithEmailAndPassword(auth, email, password);
         const user = userCredential.user;
 
-        // Guardar respaldo
         localStorage.setItem("userEmail", user.email);
         localStorage.setItem("userUid", user.uid);
 
-        // Redirigir según tipo de usuario
-        if (user.email === "ti43300@uvp.edu.mx") {
+        if (user.email === "ti43300@uvp.edu.mx", "multitoperformance@gmail.com") {
           window.location.href = "admin.html";
         } else {
           window.location.href = "perfil.html";
@@ -172,9 +240,7 @@
       }
     };
 
-    // ============================
     // ✉️ Recuperar contraseña
-    // ============================
     window.resetPassword = async function() {
       const email = document.getElementById("email").value.trim();
       if (!email) {
