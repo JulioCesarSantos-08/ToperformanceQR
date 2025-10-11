@@ -223,11 +223,11 @@
         localStorage.setItem("userEmail", user.email);
         localStorage.setItem("userUid", user.uid);
 
-        if (user.email === "ti43300@uvp.edu.mx", "multitoperformance@gmail.com") {
-          window.location.href = "admin.html";
-        } else {
-          window.location.href = "perfil.html";
-        }
+if (user.email === "ti43300@uvp.edu.mx" || user.email === "multitoperformance@gmail.com") {
+  window.location.href = "admin.html";
+} else {
+  window.location.href = "perfil.html";
+}
       } catch (error) {
         if (error.code === "auth/invalid-credential") {
           alert("Correo o contraseña incorrectos.");
