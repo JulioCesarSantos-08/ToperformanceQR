@@ -1,14 +1,3 @@
-/********************
-  admin.js actualizado v2
-  - Admin: Alta / edición / eliminación de clientes y servicios
-  - Muestra servicios en modal “Información”
-  - Colorea fechas: verde (reciente), naranja (1 mes), rojo (2+ meses)
-  - Base: Realtime Database
-********************/
-
-// =========================
-// Importar Firebase
-// =========================
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import {
   getDatabase, ref, set, get, push, update, remove
@@ -17,9 +6,6 @@ import {
   getAuth, onAuthStateChanged, signOut, createUserWithEmailAndPassword
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
-// =========================
-// Configuración Firebase
-// =========================
 const firebaseConfig = {
   apiKey: "AIzaSyBA_i9O3vXzFn2rIKY4XQzll2fLvmD-u3A",
   authDomain: "toperformance-50d5a.firebaseapp.com",
@@ -30,9 +16,6 @@ const firebaseConfig = {
   appId: "1:1020165964748:web:f05155f982eb4f2eaf9369"
 };
 
-// =========================
-// Inicialización
-// =========================
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 const auth = getAuth(app);
@@ -43,9 +26,6 @@ const formServicio = document.getElementById("formServicio");
 const listaClientes = document.getElementById("listaClientes");
 const clienteSelect = document.getElementById("clienteSelect");
 
-// =========================
-// Validar sesión
-// =========================
 onAuthStateChanged(auth, (user) => {
   if (!user) {
     window.location.href = "index.html";
@@ -54,17 +34,11 @@ onAuthStateChanged(auth, (user) => {
   }
 });
 
-// =========================
-// Cerrar sesión
-// =========================
 logoutBtn.addEventListener("click", async () => {
   await signOut(auth);
   window.location.href = "index.html";
 });
 
-// =========================
-// Alta cliente
-// =========================
 formAltaCliente.addEventListener("submit", async (e) => {
   e.preventDefault();
 
@@ -86,9 +60,7 @@ formAltaCliente.addEventListener("submit", async (e) => {
     try {
       await createUserWithEmailAndPassword(auth, correo, password);
       alert("Usuario creado en Firebase Auth (no se cerró tu sesión).");
-    } catch (err) {
-      console.warn("Error creando usuario:", err.message);
-    }
+    } catch (err) {}
   }
 
   await set(ref(db, "clientes/" + key), {
@@ -102,9 +74,6 @@ formAltaCliente.addEventListener("submit", async (e) => {
   cargarClientes();
 });
 
-// =========================
-// Cargar lista de clientes
-// =========================
 async function cargarClientes() {
   listaClientes.innerHTML = "";
   clienteSelect.innerHTML = "<option value=''>Selecciona un cliente</option>";
@@ -145,9 +114,6 @@ async function cargarClientes() {
 }
 cargarClientes();
 
-// =========================
-// Registrar servicio
-// =========================
 formServicio.addEventListener("submit", async (e) => {
   e.preventDefault();
 
@@ -173,9 +139,6 @@ formServicio.addEventListener("submit", async (e) => {
   formServicio.reset();
 });
 
-// =========================
-// Editar cliente
-// =========================
 window.editarCliente = async function(key) {
   const snap = await get(ref(db, "clientes/" + key));
   if (!snap.exists()) return alert("Cliente no encontrado.");
@@ -218,9 +181,6 @@ document.getElementById("cancelarEdicion").addEventListener("click", () => {
   window.clienteEditandoKey = null;
 });
 
-// =========================
-// Eliminar cliente
-// =========================
 window.eliminarCliente = async function(key) {
   if (confirm("¿Eliminar este cliente y su historial?")) {
     await remove(ref(db, "clientes/" + key));
@@ -228,9 +188,6 @@ window.eliminarCliente = async function(key) {
   }
 };
 
-// =========================
-// Mostrar información de servicios (modal)
-// =========================
 window.verInformacion = async function(key) {
   const snap = await get(ref(db, "clientes/" + key));
   if (!snap.exists()) return alert("Cliente no encontrado.");
@@ -239,7 +196,6 @@ window.verInformacion = async function(key) {
   const serviciosSnap = await get(ref(db, "clientes/" + key + "/servicios"));
   const servicios = serviciosSnap.exists() ? Object.values(serviciosSnap.val()) : [];
 
-  // Crear modal
   const modal = document.createElement("div");
   modal.classList.add("modal-info");
   modal.innerHTML = `
@@ -275,7 +231,6 @@ window.verInformacion = async function(key) {
   `;
   document.body.appendChild(modal);
 
-  // CSS inline para estilo agradable
   const style = document.createElement("style");
   style.textContent = `
     .modal-info {
@@ -328,15 +283,12 @@ window.verInformacion = async function(key) {
   });
 };
 
-// =========================
-// Función color según fecha
-// =========================
 function colorFecha(fechaStr) {
   const hoy = new Date();
   const fecha = new Date(fechaStr);
   const diffMeses = (hoy.getFullYear() - fecha.getFullYear()) * 12 + (hoy.getMonth() - fecha.getMonth());
 
-  if (diffMeses <= 0) return "green";      // este mes
-  if (diffMeses === 1) return "orange";    // 1 mes
-  return "red";                            // más de 2 meses
+  if (diffMeses <= 0) return "green";
+  if (diffMeses === 1) return "orange";
+  return "red";
 }
