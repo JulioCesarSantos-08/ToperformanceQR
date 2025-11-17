@@ -215,14 +215,14 @@ body {
 
 .tabla-servicios th,
 .tabla-servicios td {
-  border: 1px solid #ccc;
+  border: 1px solid #b80909;
   padding: 8px;
   text-align: left;
 }
 
 .tabla-servicios th {
   background: #d00000;
-  color: white;
+  color: rgb(0, 0, 0);
 }
 
 .tabla-servicios tr:nth-child(even) {
