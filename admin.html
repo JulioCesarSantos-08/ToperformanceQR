@@ -4,9 +4,14 @@
   <meta charset="UTF-8">
   <title>Panel de Administrador - ToPerformance</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- CSS -->
   <link rel="stylesheet" href="admin.css">
-  <script type="module" src="admin.js"></script>
   <link rel="icon" href="imagenes/logo1.png">
+
+  <!-- JS -->
+  <script type="module" src="admin.js"></script>
+
   <style>
     .buscador-container {
       margin-bottom: 15px;
@@ -19,14 +24,16 @@
       border-radius: 8px;
       border: 1px solid #ccc;
       font-size: 16px;
-      outline: none;
-      transition: all 0.3s ease;
       margin-bottom: 10px;
+      outline: none;
+      transition: all .3s ease;
     }
     #buscadorClientes:focus, #buscadorSelectServicios:focus {
       border-color: #ff0000;
       box-shadow: 0 0 6px rgba(255,0,0,0.4);
     }
+
+    /* Modal */
     #modalEditar {
       display: none;
       position: fixed;
@@ -38,78 +45,78 @@
     }
     #modalEditar .editar-form {
       max-width: 520px;
-      margin: 0;
       background: white;
       padding: 22px;
       border-radius: 10px;
-      box-shadow: 0 8px 30px rgba(0,0,0,0.25);
       width: calc(100% - 40px);
-    }
-    #modalEditar .botones {
-      display: flex;
-      gap: 10px;
-      justify-content: flex-end;
-      margin-top: 12px;
+      box-shadow: 0 8px 30px rgba(0,0,0,0.25);
+      position: relative;
     }
     #closeModal {
       position: absolute;
-      right: 16px;
       top: 12px;
+      right: 16px;
+      font-size: 20px;
       background: transparent;
       border: none;
-      font-size: 20px;
       cursor: pointer;
-      color: #333;
     }
   </style>
 </head>
+
 <body>
 
 <header class="header">
   <div class="header-left" style="display:flex; align-items:center; gap:12px;">
-    <img src="imagenes/logo1.png" alt="Logo Taller" class="logo" style="height:45px;">
+    <img src="imagenes/logo1.png" class="logo" style="height:45px;">
     <h1 style="margin:0; font-size:1.2rem;">Panel de Administrador</h1>
   </div>
   <div class="header-right">
-    <span id="adminEmail" style="margin-right:12px;"></span>
+    <span id="adminEmail"></span>
     <button id="logoutBtn">Cerrar Sesión</button>
   </div>
 </header>
 
 <main class="container">
 
+  <!-- Alta de cliente -->
   <section class="card">
     <h2>Dar de Alta Cliente</h2>
     <form id="formAltaCliente">
       <input type="text" id="nombreCliente" placeholder="Nombre del cliente" required>
-      <input type="email" id="emailCliente" placeholder="Correo electrónico" required>
+      <input type="email" id="emailCliente" placeholder="Correo" required>
       <input type="password" id="passwordCliente" placeholder="Contraseña (opcional)">
-      <input type="text" id="marcaVehiculo" placeholder="Marca del carro" required>
-      <input type="text" id="modeloVehiculo" placeholder="Modelo del carro" required>
+      <input type="text" id="marcaVehiculo" placeholder="Marca del vehículo" required>
+      <input type="text" id="modeloVehiculo" placeholder="Modelo del vehículo" required>
       <input type="number" id="anioVehiculo" placeholder="Año" required>
       <input type="text" id="placaVehiculo" placeholder="Placa" required>
       <input type="number" id="kilometrajeVehiculo" placeholder="Kilometraje" required>
-      <input type="text" id="imagenVehiculo" placeholder="Nombre de la imagen (ej. autodejuan.png)">
+
+      <!-- Imagen -->
+      <input type="text" id="imagenVehiculo" placeholder="Nombre de la imagen (ej. autojuan.png)">
       <button type="submit">Guardar Cliente</button>
     </form>
-    <p class="nota">Si introduces contraseña, el sistema intentará crear la cuenta en Firebase Auth, sin cerrar tu sesión actual.</p>
+    <p class="nota">Si agregas contraseña, se creará la cuenta en Auth sin cerrar tu sesión actual.</p>
   </section>
 
+  <!-- Registrar servicio -->
   <section class="card">
     <h2>Registrar Servicio a Cliente</h2>
 
+    <!-- Buscador -->
     <input type="text" id="buscadorSelectServicios" placeholder="Buscar cliente...">
 
     <form id="formServicio">
-      <select id="clienteSelect" size="6" required style="width:100%; padding:10px;"></select>
+      <select id="clienteSelect" size="6" required></select>
       <input type="text" id="servicioNombre" placeholder="Nombre del servicio" required>
       <input type="date" id="servicioFecha" required>
-      <input type="number" id="servicioCosto" placeholder="Costo del servicio" required>
-      <textarea id="servicioDescripcion" placeholder="Descripción del servicio"></textarea>
+      <input type="number" id="servicioCosto" placeholder="Costo" required>
+      <textarea id="servicioDescripcion" placeholder="Descripción"></textarea>
       <button type="submit">Guardar Servicio</button>
     </form>
   </section>
 
+  <!-- Lista clientes -->
   <section class="card">
     <h2>Lista de Clientes Registrados</h2>
     <div class="buscador-container">
@@ -120,22 +127,23 @@
 
 </main>
 
+<!-- MODAL EDITAR CLIENTE -->
 <div id="modalEditar">
   <div class="editar-form">
     <button id="closeModal">✕</button>
-    <h2 style="color:#d00000; margin-top:0;">Editar Cliente</h2>
+    <h2 style="margin-top:0; color:#d00000;">Editar Cliente</h2>
 
     <form id="formEditarCliente">
-      <label>Nombre del cliente</label>
+      <label>Nombre</label>
       <input type="text" id="editNombre" required>
 
-      <label>Correo electrónico</label>
+      <label>Correo</label>
       <input type="email" id="editCorreo" required>
 
-      <label>Marca del carro</label>
+      <label>Marca</label>
       <input type="text" id="editMarca">
 
-      <label>Modelo del carro</label>
+      <label>Modelo</label>
       <input type="text" id="editModelo">
 
       <label>Año</label>
@@ -147,11 +155,11 @@
       <label>Kilometraje</label>
       <input type="number" id="editKilometraje">
 
-      <label>Nombre de la imagen (ej. auto.png)</label>
+      <label>Imagen</label>
       <input type="text" id="editImagen">
 
       <div class="botones">
-        <button type="submit" id="guardarCambios">Guardar Cambios</button>
+        <button type="submit">Guardar cambios</button>
         <button type="button" id="cancelarEdicion">Cancelar</button>
       </div>
     </form>
@@ -160,249 +168,41 @@
 
 <script>
   function normalizeText(s) {
-    return (s || "").toString().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+    return (s || "").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
   }
 
-  document.addEventListener('DOMContentLoaded', () => {
+  document.addEventListener("DOMContentLoaded", () => {
 
-    const buscador = document.getElementById('buscadorClientes');
-    const lista = document.getElementById('listaClientes');
-    const buscadorSelect = document.getElementById('buscadorSelectServicios');
-    const select = document.getElementById('clienteSelect');
-
-    buscador.addEventListener('input', () => {
-      const termino = normalizeText(buscador.value.trim());
-      const clientes = lista.querySelectorAll('.cliente-card');
-      clientes.forEach(c => {
-        const texto = normalizeText(c.textContent);
-        c.style.display = texto.includes(termino) ? 'block' : 'none';
+    // Buscador lista clientes
+    const buscador = document.getElementById("buscadorClientes");
+    const lista = document.getElementById("listaClientes");
+    buscador.addEventListener("input", () => {
+      const filtro = normalizeText(buscador.value.trim());
+      lista.querySelectorAll(".cliente-card").forEach(c => {
+        c.style.display = normalizeText(c.textContent).includes(filtro) ? "block" : "none";
       });
     });
 
-    buscadorSelect.addEventListener('input', () => {
+    // Buscador selector servicios
+    const buscadorSelect = document.getElementById("buscadorSelectServicios");
+    const select = document.getElementById("clienteSelect");
+    buscadorSelect.addEventListener("input", () => {
       const filtro = normalizeText(buscadorSelect.value.trim());
-      const opciones = select.querySelectorAll('option');
-      opciones.forEach(op => {
-        const texto = normalizeText(op.textContent);
-        op.hidden = filtro !== "" && !texto.includes(filtro);
+      select.querySelectorAll("option").forEach(op => {
+        op.hidden = filtro && !normalizeText(op.textContent).includes(filtro);
       });
     });
 
-    const cerrar = document.getElementById('closeModal');
-    const modal = document.getElementById('modalEditar');
-    const cancelar = document.getElementById('cancelarEdicion');
+    // Modal
+    const modal = document.getElementById("modalEditar");
+    const close = document.getElementById("closeModal");
+    const cancel = document.getElementById("cancelarEdicion");
 
-    if (cerrar) cerrar.addEventListener('click', () => modal.style.display = 'none');
-    if (cancelar) cancelar.addEventListener('click', () => modal.style.display = 'none');
-    window.addEventListener('click', (e) => {
-      if (e.target === modal) modal.style.display = 'none';
-    });
+    close.onclick = () => modal.style.display = "none";
+    cancel.onclick = () => modal.style.display = "none";
+    window.onclick = e => { if (e.target === modal) modal.style.display = "none"; };
   });
 </script>
 
 </body>
-</html><!DOCTYPE html>
-<html lang="es">
-<head>
-  <meta charset="UTF-8">
-  <title>Panel de Administrador - ToPerformance</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="icon" href="imagenes/logo1.png" />
-
-  <!-- CSS -->
-  <link rel="stylesheet" href="admin.css">
-
-  <!-- JS -->
-  <script type="module" src="admin.js"></script>
-
-  <style>
-    /* ======== Estilos buscador ======== */
-    .buscador-container {
-      margin-bottom: 15px;
-      text-align: center;
-    }
-
-    #buscadorClientes {
-      width: 90%;
-      max-width: 400px;
-      padding: 10px;
-      border-radius: 8px;
-      border: 1px solid #ccc;
-      font-size: 16px;
-      outline: none;
-      transition: all 0.3s ease;
-    }
-
-    #buscadorClientes:focus {
-      border-color: #ff0000;
-      box-shadow: 0 0 6px rgba(255, 0, 0, 0.4);
-    }
-
-    #listaClientes {
-      margin-top: 15px;
-    }
-
-    /* Modal overlay styles (keeps modal centered when admin.js sets display) */
-    #modalEditar {
-      display: none;
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,0.45);
-      justify-content: center;
-      align-items: center;
-      z-index: 1000;
-    }
-
-    #modalEditar .editar-form {
-      max-width: 520px;
-      margin: 0;
-      background: white;
-      padding: 22px;
-      border-radius: 10px;
-      box-shadow: 0 8px 30px rgba(0,0,0,0.25);
-      width: calc(100% - 40px);
-    }
-
-    #modalEditar .botones {
-      display: flex;
-      gap: 10px;
-      justify-content: flex-end;
-      margin-top: 12px;
-    }
-
-    #closeModal {
-      position: absolute;
-      right: 16px;
-      top: 12px;
-      background: transparent;
-      border: none;
-      font-size: 20px;
-      cursor: pointer;
-      color: #333;
-    }
-  </style>
-</head>
-<body>
-  <!-- ======== Encabezado ======== -->
-  <header class="header">
-    <div class="header-left" style="display:flex; align-items:center; gap:12px;">
-      <img src="imagenes/logo1.png" alt="Logo Taller" class="logo" style="height:45px;">
-      <h1 style="margin:0; font-size:1.2rem;">Panel de Administrador</h1>
-    </div>
-    <div class="header-right">
-      <span id="adminEmail" style="margin-right:12px;"></span>
-      <button id="logoutBtn">Cerrar Sesión</button>
-    </div>
-  </header>
-
-  <!-- ======== Contenido principal ======== -->
-  <main class="container">
-    <!-- Alta de clientes -->
-    <section class="card">
-      <h2>Dar de Alta Cliente</h2>
-      <form id="formAltaCliente">
-        <input type="text" id="nombreCliente" placeholder="Nombre del cliente" required>
-        <input type="email" id="emailCliente" placeholder="Correo electrónico" required>
-        <input type="password" id="passwordCliente" placeholder="Contraseña (opcional)">
-        <input type="text" id="modeloVehiculo" placeholder="Modelo del vehículo" required>
-        <input type="text" id="placaVehiculo" placeholder="Placa" required>
-        <input type="text" id="imagenVehiculo" placeholder="Nombre de la imagen (ej. autodejuan.png)">
-        <button type="submit">Guardar Cliente</button>
-      </form>
-      <p class="nota">
-        Si introduces contraseña, el sistema intentará crear la cuenta en Firebase Auth, sin cerrar tu sesión actual.
-      </p>
-    </section>
-
-    <!-- Registrar servicios -->
-    <section class="card">
-      <h2>Registrar Servicio a Cliente</h2>
-      <form id="formServicio">
-        <select id="clienteSelect" required></select>
-        <input type="text" id="servicioNombre" placeholder="Nombre del servicio (ej. Cambio de aceite)" required>
-        <input type="date" id="servicioFecha" required>
-        <input type="number" id="servicioCosto" placeholder="Costo del servicio" required>
-        <textarea id="servicioDescripcion" placeholder="Descripción del servicio"></textarea>
-        <button type="submit">Guardar Servicio</button>
-      </form>
-    </section>
-
-    <!-- Lista de clientes -->
-    <section class="card">
-      <h2>Lista de Clientes Registrados</h2>
-
-      <!-- 🔍 Buscador -->
-      <div class="buscador-container">
-        <input type="text" id="buscadorClientes" placeholder="Buscar cliente por nombre o correo...">
-      </div>
-
-      <div id="listaClientes"></div>
-    </section>
-  </main>
-
-  <!-- ======== Modal editar cliente (coincide con admin.js) ======== -->
-  <div id="modalEditar" aria-hidden="true">
-    <div class="editar-form" role="dialog" aria-modal="true" aria-labelledby="tituloEditar">
-      <button id="closeModal" aria-label="Cerrar">✕</button>
-      <h2 id="tituloEditar" style="color:#d00000; margin-top:0;">Editar Cliente</h2>
-
-      <form id="formEditarCliente">
-        <label for="editNombre">Nombre del cliente</label>
-        <input type="text" id="editNombre" required>
-
-        <label for="editCorreo">Correo electrónico</label>
-        <input type="email" id="editCorreo" required>
-
-        <label for="editModelo">Modelo del vehículo</label>
-        <input type="text" id="editModelo">
-
-        <label for="editPlaca">Placa</label>
-        <input type="text" id="editPlaca">
-
-        <label for="editImagen">Nombre de la imagen (ej. auto.png)</label>
-        <input type="text" id="editImagen">
-
-        <div class="botones">
-          <button type="submit" id="guardarCambios">Guardar Cambios</button>
-          <button type="button" class="cancelar" id="cancelarEdicion">Cancelar</button>
-        </div>
-      </form>
-    </div>
-  </div>
-
-  <!-- ======== Script buscador (ajustado a .cliente-card) ======== -->
-  <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      const buscador = document.getElementById('buscadorClientes');
-      const lista = document.getElementById('listaClientes');
-
-      buscador.addEventListener('input', () => {
-        const termino = buscador.value.toLowerCase().trim();
-        const clientes = lista.querySelectorAll('.cliente-card');
-
-        clientes.forEach(cliente => {
-          const texto = cliente.textContent.toLowerCase();
-          cliente.style.display = texto.includes(termino) ? 'block' : 'none';
-        });
-      });
-
-      // Cerrar modal local (también lo maneja admin.js closeModal listener)
-      const cerrar = document.getElementById('closeModal');
-      const modal = document.getElementById('modalEditar');
-      const cancelar = document.getElementById('cancelarEdicion');
-
-      if (cerrar) cerrar.addEventListener('click', () => modal.style.display = 'none');
-      if (cancelar) cancelar.addEventListener('click', () => modal.style.display = 'none');
-      // click fuera para cerrar
-      window.addEventListener('click', (e) => {
-        if (e.target === modal) modal.style.display = 'none';
-      });
-    });
-    console.log("HTML cargado correctamente");
-  </script>
-</body>
-
 </html>
-
-
-
