@@ -20,18 +20,12 @@ const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 const auth = getAuth(app);
 
-// ELEMENTOS
 const logoutBtn = document.getElementById("logoutBtn");
 const formAltaCliente = document.getElementById("formAltaCliente");
 const formServicio = document.getElementById("formServicio");
 const listaClientes = document.getElementById("listaClientes");
 const clienteSelect = document.getElementById("clienteSelect");
 
-// BUSCADORES
-const buscadorClientes = document.getElementById("buscadorClientes");
-const buscadorSelect = document.getElementById("buscadorSelect");
-
-// LOGIN
 onAuthStateChanged(auth, (user) => {
   if (!user) {
     window.location.href = "index.html";
@@ -40,13 +34,11 @@ onAuthStateChanged(auth, (user) => {
   }
 });
 
-// CERRAR SESIÓN
 logoutBtn.addEventListener("click", async () => {
   await signOut(auth);
   window.location.href = "index.html";
 });
 
-// REGISTRO DE CLIENTE
 formAltaCliente.addEventListener("submit", async (e) => {
   e.preventDefault();
 
@@ -82,7 +74,6 @@ formAltaCliente.addEventListener("submit", async (e) => {
   cargarClientes();
 });
 
-// CARGAR CLIENTES
 async function cargarClientes() {
   listaClientes.innerHTML = "";
   clienteSelect.innerHTML = "<option value=''>Selecciona un cliente</option>";
@@ -93,13 +84,9 @@ async function cargarClientes() {
     return;
   }
 
-  window.listaClientesData = []; // Guardar para buscador
-
   snap.forEach(c => {
     const cliente = c.val();
     const key = c.key;
-
-    window.listaClientesData.push({ key, ...cliente });
 
     const div = document.createElement("div");
     div.classList.add("cliente-card", "cliente-item");
@@ -127,61 +114,6 @@ async function cargarClientes() {
 }
 cargarClientes();
 
-// 🔍 BUSCADOR DE CLIENTES EN LA LISTA
-buscadorClientes.addEventListener("input", () => {
-  const texto = buscadorClientes.value.toLowerCase();
-
-  const filtrados = window.listaClientesData.filter(c =>
-    c.nombre.toLowerCase().includes(texto) ||
-    c.email.toLowerCase().includes(texto) ||
-    c.vehiculo.modelo.toLowerCase().includes(texto) ||
-    c.vehiculo.placa.toLowerCase().includes(texto)
-  );
-
-  listaClientes.innerHTML = "";
-
-  filtrados.forEach(cliente => {
-    const div = document.createElement("div");
-    div.classList.add("cliente-card", "cliente-item");
-
-    div.innerHTML = `
-      <h3>${cliente.nombre}</h3>
-      <p><b>Email:</b> ${cliente.email}</p>
-      <p><b>Vehículo:</b> ${cliente.vehiculo.modelo} (${cliente.vehiculo.placa})</p>
-      <img src="imagenes/${cliente.vehiculo.imagen}" alt="Vehículo" style="max-width:200px; border-radius:8px;">
-      <div class="btns">
-        <button onclick="verInformacion('${cliente.key}')">Información</button>
-        <button onclick="editarCliente('${cliente.key}')">Editar</button>
-        <button class="danger" onclick="eliminarCliente('${cliente.key}')">Eliminar</button>
-      </div>
-      <hr>
-    `;
-
-    listaClientes.appendChild(div);
-  });
-});
-
-// 🔍 BUSCADOR EN SELECT PARA REGISTRAR SERVICIO
-buscadorSelect.addEventListener("input", () => {
-  const texto = buscadorSelect.value.toLowerCase();
-
-  clienteSelect.innerHTML = "<option value=''>Selecciona un cliente</option>";
-
-  window.listaClientesData
-    .filter(c =>
-      c.nombre.toLowerCase().includes(texto) ||
-      c.vehiculo.modelo.toLowerCase().includes(texto) ||
-      c.vehiculo.placa.toLowerCase().includes(texto)
-    )
-    .forEach(c => {
-      const opt = document.createElement("option");
-      opt.value = c.key;
-      opt.textContent = `${c.nombre} - ${c.vehiculo.modelo}`;
-      clienteSelect.appendChild(opt);
-    });
-});
-
-// REGISTRO DE SERVICIO
 formServicio.addEventListener("submit", async (e) => {
   e.preventDefault();
 
@@ -207,7 +139,6 @@ formServicio.addEventListener("submit", async (e) => {
   formServicio.reset();
 });
 
-// EDITAR CLIENTE
 window.editarCliente = async function(key) {
   const snap = await get(ref(db, "clientes/" + key));
   if (!snap.exists()) return alert("Cliente no encontrado.");
@@ -223,7 +154,6 @@ window.editarCliente = async function(key) {
   window.clienteEditandoKey = key;
 };
 
-// GUARDAR EDICIÓN
 document.getElementById("formEditarCliente").addEventListener("submit", async (e) => {
   e.preventDefault();
   const key = window.clienteEditandoKey;
@@ -246,13 +176,11 @@ document.getElementById("formEditarCliente").addEventListener("submit", async (e
   cargarClientes();
 });
 
-// CANCELAR EDICIÓN
 document.getElementById("cancelarEdicion").addEventListener("click", () => {
   document.getElementById("modalEditar").style.display = "none";
   window.clienteEditandoKey = null;
 });
 
-// ELIMINAR CLIENTE
 window.eliminarCliente = async function(key) {
   if (confirm("¿Eliminar este cliente y su historial?")) {
     await remove(ref(db, "clientes/" + key));
@@ -260,7 +188,6 @@ window.eliminarCliente = async function(key) {
   }
 };
 
-// VER INFORMACIÓN
 window.verInformacion = async function(key) {
   const snap = await get(ref(db, "clientes/" + key));
   if (!snap.exists()) return alert("Cliente no encontrado.");
@@ -304,13 +231,58 @@ window.verInformacion = async function(key) {
   `;
   document.body.appendChild(modal);
 
+  const style = document.createElement("style");
+  style.textContent = `
+    .modal-info {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.6);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 2000;
+    }
+    .modal-content {
+      background: #fff;
+      border-radius: 10px;
+      padding: 20px;
+      width: 90%;
+      max-width: 700px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.25);
+      overflow-y: auto;
+      max-height: 90vh;
+    }
+    .tabla-servicios {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+    }
+    .tabla-servicios th, .tabla-servicios td {
+      border: 1px solid #ccc;
+      padding: 8px;
+      text-align: left;
+    }
+    .tabla-servicios th {
+      background-color: #f5f5f5;
+    }
+    .cerrar-modal {
+      margin-top: 15px;
+      background: #d00000;
+      color: #fff;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+  `;
+  document.head.appendChild(style);
+
   modal.querySelector(".cerrar-modal").addEventListener("click", () => modal.remove());
   modal.addEventListener("click", (e) => {
     if (e.target === modal) modal.remove();
   });
 };
 
-// COLORES DE FECHA
 function colorFecha(fechaStr) {
   const hoy = new Date();
   const fecha = new Date(fechaStr);
