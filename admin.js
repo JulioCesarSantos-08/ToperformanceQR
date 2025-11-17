@@ -39,6 +39,10 @@ logoutBtn.addEventListener("click", async () => {
   window.location.href = "index.html";
 });
 
+// ======================================================
+// 🚨 EVITAR DUPLICADOS AL REGISTRAR CLIENTE
+// ======================================================
+
 formAltaCliente.addEventListener("submit", async (e) => {
   e.preventDefault();
 
@@ -56,14 +60,22 @@ formAltaCliente.addEventListener("submit", async (e) => {
 
   const key = correo.replace(/\./g, "_");
 
-  if (password) {
-    try {
-      await createUserWithEmailAndPassword(auth, correo, password);
-      alert("Usuario creado en Firebase Auth (no se cerró tu sesión).");
-    } catch (err) {}
+  // 🔍 Verificar si ya existe el cliente
+  const existing = await get(ref(db, "clientes/" + key));
+
+  if (existing.exists()) {
+    alert("⚠ Ya existe un cliente con este correo. Se actualizarán sus datos.");
+  } else {
+    // Crear usuario en Auth solo si no existe
+    if (password) {
+      try {
+        await createUserWithEmailAndPassword(auth, correo, password);
+        alert("Usuario creado en Firebase Auth (no se cerró tu sesión).");
+      } catch (err) {}
+    }
   }
 
-  await set(ref(db, "clientes/" + key), {
+  await update(ref(db, "clientes/" + key), {
     nombre,
     email: correo,
     vehiculo: { modelo, placa, imagen: imagen || "default.png" }
@@ -73,6 +85,8 @@ formAltaCliente.addEventListener("submit", async (e) => {
   formAltaCliente.reset();
   cargarClientes();
 });
+
+// ======================================================
 
 async function cargarClientes() {
   listaClientes.innerHTML = "";
