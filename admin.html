@@ -1,207 +1,168 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <title>Panel de Administrador - ToPerformance</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8">
+<title>Panel de Administrador - ToPerformance</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="admin.css">
+<link rel="icon" href="imagenes/logo1.png">
+<script type="module" src="admin.js"></script>
 
-  <!-- CSS -->
-  <link rel="stylesheet" href="admin.css">
-  <link rel="icon" href="imagenes/logo1.png">
-
-  <!-- JS -->
-  <script type="module" src="admin.js"></script>
-
-  <style>
-    .buscador-container {
-      margin-bottom: 15px;
-      text-align: center;
-    }
-    #buscadorClientes, #buscadorSelectServicios {
-      width: 90%;
-      max-width: 400px;
-      padding: 10px;
-      border-radius: 8px;
-      border: 1px solid #ccc;
-      font-size: 16px;
-      margin-bottom: 10px;
-      outline: none;
-      transition: all .3s ease;
-    }
-    #buscadorClientes:focus, #buscadorSelectServicios:focus {
-      border-color: #ff0000;
-      box-shadow: 0 0 6px rgba(255,0,0,0.4);
-    }
-
-    /* Modal */
-    #modalEditar {
-      display: none;
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,0.45);
-      justify-content: center;
-      align-items: center;
-      z-index: 1000;
-    }
-    #modalEditar .editar-form {
-      max-width: 520px;
-      background: white;
-      padding: 22px;
-      border-radius: 10px;
-      width: calc(100% - 40px);
-      box-shadow: 0 8px 30px rgba(0,0,0,0.25);
-      position: relative;
-    }
-    #closeModal {
-      position: absolute;
-      top: 12px;
-      right: 16px;
-      font-size: 20px;
-      background: transparent;
-      border: none;
-      cursor: pointer;
-    }
-  </style>
+<style>
+.buscador-container{margin-bottom:15px;text-align:center}
+#buscadorClientes,#buscadorSelectServicios{
+width:90%;max-width:400px;padding:10px;border-radius:8px;
+border:1px solid #ccc;font-size:16px;margin-bottom:10px;outline:none
+}
+#buscadorClientes:focus,#buscadorSelectServicios:focus{
+border-color:#ff0000;box-shadow:0 0 6px rgba(255,0,0,0.4)
+}
+#modalEditar{
+display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);
+justify-content:center;align-items:center;z-index:1000
+}
+#modalEditar .editar-form{
+max-width:520px;background:white;padding:22px;border-radius:10px;
+width:calc(100% - 40px);box-shadow:0 8px 30px rgba(0,0,0,0.25);
+position:relative
+}
+#closeModal{
+position:absolute;top:12px;right:16px;font-size:20px;
+background:transparent;border:none;cursor:pointer
+}
+</style>
 </head>
 
 <body>
 
 <header class="header">
-  <div class="header-left" style="display:flex; align-items:center; gap:12px;">
-    <img src="imagenes/logo1.png" class="logo" style="height:45px;">
-    <h1 style="margin:0; font-size:1.2rem;">Panel de Administrador</h1>
-  </div>
-  <div class="header-right">
-    <span id="adminEmail"></span>
-    <button id="logoutBtn">Cerrar Sesión</button>
-  </div>
+<div style="display:flex;align-items:center;gap:12px;">
+<img src="imagenes/logo1.png" style="height:45px;">
+<h1 style="margin:0;font-size:1.2rem;">Panel de Administrador</h1>
+</div>
+<div>
+<span id="adminEmail"></span>
+<button id="logoutBtn">Cerrar Sesión</button>
+</div>
 </header>
 
 <main class="container">
 
-  <!-- Alta de cliente -->
-  <section class="card">
-    <h2>Dar de Alta Cliente</h2>
-    <form id="formAltaCliente">
-      <input type="text" id="nombreCliente" placeholder="Nombre del cliente" required>
-      <input type="email" id="emailCliente" placeholder="Correo" required>
-      <input type="password" id="passwordCliente" placeholder="Contraseña (opcional)">
-      <input type="text" id="marcaVehiculo" placeholder="Marca del vehículo" required>
-      <input type="text" id="modeloVehiculo" placeholder="Modelo del vehículo" required>
-      <input type="number" id="anioVehiculo" placeholder="Año" required>
-      <input type="text" id="placaVehiculo" placeholder="Placa" required>
-      <input type="number" id="kilometrajeVehiculo" placeholder="Kilometraje" required>
+<section class="card">
+<h2>Dar de Alta Cliente</h2>
+<form id="formAltaCliente">
+<input type="text" id="nombreCliente" placeholder="Nombre del cliente" required>
+<input type="email" id="emailCliente" placeholder="Correo" required>
+<input type="text" id="telefonoCliente" placeholder="Teléfono" required>
+<input type="password" id="passwordCliente" placeholder="Contraseña (opcional)">
+<input type="text" id="marcaVehiculo" placeholder="Marca del vehículo" required>
+<input type="text" id="modeloVehiculo" placeholder="Modelo del vehículo" required>
+<input type="number" id="anioVehiculo" placeholder="Año" required>
+<input type="text" id="placaVehiculo" placeholder="Placa" required>
+<input type="number" id="kilometrajeVehiculo" placeholder="Kilometraje actual" required>
+<input type="text" id="imagenVehiculo" placeholder="Nombre de la imagen (ej. autojuan.png)">
+<button type="submit">Guardar Cliente</button>
+</form>
+<p class="nota">Si agregas contraseña, se creará la cuenta en Auth sin cerrar tu sesión actual.</p>
+</section>
 
-      <!-- Imagen -->
-      <input type="text" id="imagenVehiculo" placeholder="Nombre de la imagen (ej. autojuan.png)">
-      <button type="submit">Guardar Cliente</button>
-    </form>
-    <p class="nota">Al crear Una cuenta y darle una contraseña, se le agrega correctamente.</p>
-  </section>
+<section class="card">
+<h2>Registrar Servicio a Cliente</h2>
 
-  <!-- Registrar servicio -->
-  <section class="card">
-    <h2>Registrar Servicio a Cliente</h2>
+<input type="text" id="buscadorSelectServicios" placeholder="Buscar cliente...">
 
-    <!-- Buscador -->
-    <input type="text" id="buscadorSelectServicios" placeholder="Buscar cliente...">
+<form id="formServicio">
+<select id="clienteSelect" size="6" required></select>
+<input type="text" id="servicioNombre" placeholder="Nombre del servicio" required>
+<input type="date" id="servicioFecha" required>
+<input type="number" id="servicioCosto" placeholder="Costo" required>
+<input type="number" id="servicioKilometraje" placeholder="Kilometraje actual" required>
+<textarea id="servicioDescripcion" placeholder="Descripción"></textarea>
+<button type="submit">Guardar Servicio</button>
+</form>
+</section>
 
-    <form id="formServicio">
-      <select id="clienteSelect" size="6" required></select>
-      <input type="text" id="servicioNombre" placeholder="Nombre del servicio" required>
-      <input type="date" id="servicioFecha" required>
-      <input type="number" id="servicioCosto" placeholder="Costo" required>
-      <textarea id="servicioDescripcion" placeholder="Descripción"></textarea>
-      <button type="submit">Guardar Servicio</button>
-    </form>
-  </section>
-
-  <!-- Lista clientes -->
-  <section class="card">
-    <h2>Lista de Clientes Registrados</h2>
-    <div class="buscador-container">
-      <input type="text" id="buscadorClientes" placeholder="Buscar cliente por nombre o correo...">
-    </div>
-    <div id="listaClientes"></div>
-  </section>
+<section class="card">
+<h2>Lista de Clientes Registrados</h2>
+<div class="buscador-container">
+<input type="text" id="buscadorClientes" placeholder="Buscar cliente por nombre o correo...">
+</div>
+<div id="listaClientes"></div>
+</section>
 
 </main>
 
-<!-- MODAL EDITAR CLIENTE -->
 <div id="modalEditar">
-  <div class="editar-form">
-    <button id="closeModal">✕</button>
-    <h2 style="margin-top:0; color:#d00000;">Editar Cliente</h2>
+<div class="editar-form">
+<button id="closeModal">✕</button>
+<h2 style="margin-top:0;color:#d00000;">Editar Cliente</h2>
 
-    <form id="formEditarCliente">
-      <label>Nombre</label>
-      <input type="text" id="editNombre" required>
+<form id="formEditarCliente">
+<label>Nombre</label>
+<input type="text" id="editNombre" required>
 
-      <label>Correo</label>
-      <input type="email" id="editCorreo" required>
+<label>Correo</label>
+<input type="email" id="editCorreo" required>
 
-      <label>Marca</label>
-      <input type="text" id="editMarca">
+<label>Teléfono</label>
+<input type="text" id="editTelefono">
 
-      <label>Modelo</label>
-      <input type="text" id="editModelo">
+<label>Marca</label>
+<input type="text" id="editMarca">
 
-      <label>Año</label>
-      <input type="number" id="editAnio">
+<label>Modelo</label>
+<input type="text" id="editModelo">
 
-      <label>Placa</label>
-      <input type="text" id="editPlaca">
+<label>Año</label>
+<input type="number" id="editAnio">
 
-      <label>Kilometraje</label>
-      <input type="number" id="editKilometraje">
+<label>Placa</label>
+<input type="text" id="editPlaca">
 
-      <label>Imagen</label>
-      <input type="text" id="editImagen">
+<label>Kilometraje</label>
+<input type="number" id="editKilometraje">
 
-      <div class="botones">
-        <button type="submit">Guardar cambios</button>
-        <button type="button" id="cancelarEdicion">Cancelar</button>
-      </div>
-    </form>
-  </div>
+<label>Imagen</label>
+<input type="text" id="editImagen">
+
+<div class="botones">
+<button type="submit">Guardar cambios</button>
+<button type="button" id="cancelarEdicion">Cancelar</button>
+</div>
+</form>
+</div>
 </div>
 
 <script>
-  function normalizeText(s) {
-    return (s || "").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-  }
+function normalizeText(s){
+return (s||"").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"");
+}
 
-  document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded",()=>{
 
-    // Buscador lista clientes
-    const buscador = document.getElementById("buscadorClientes");
-    const lista = document.getElementById("listaClientes");
-    buscador.addEventListener("input", () => {
-      const filtro = normalizeText(buscador.value.trim());
-      lista.querySelectorAll(".cliente-card").forEach(c => {
-        c.style.display = normalizeText(c.textContent).includes(filtro) ? "block" : "none";
-      });
-    });
+const buscador=document.getElementById("buscadorClientes");
+const lista=document.getElementById("listaClientes");
+buscador.addEventListener("input",()=>{
+const filtro=normalizeText(buscador.value.trim());
+lista.querySelectorAll(".cliente-card").forEach(c=>{
+c.style.display=normalizeText(c.textContent).includes(filtro)?"block":"none";
+});
+});
 
-    // Buscador selector servicios
-    const buscadorSelect = document.getElementById("buscadorSelectServicios");
-    const select = document.getElementById("clienteSelect");
-    buscadorSelect.addEventListener("input", () => {
-      const filtro = normalizeText(buscadorSelect.value.trim());
-      select.querySelectorAll("option").forEach(op => {
-        op.hidden = filtro && !normalizeText(op.textContent).includes(filtro);
-      });
-    });
+const buscadorSelect=document.getElementById("buscadorSelectServicios");
+const select=document.getElementById("clienteSelect");
+buscadorSelect.addEventListener("input",()=>{
+const filtro=normalizeText(buscadorSelect.value.trim());
+select.querySelectorAll("option").forEach(op=>{
+op.hidden=filtro&&!normalizeText(op.textContent).includes(filtro);
+});
+});
 
-    // Modal
-    const modal = document.getElementById("modalEditar");
-    const close = document.getElementById("closeModal");
-    const cancel = document.getElementById("cancelarEdicion");
-
-    close.onclick = () => modal.style.display = "none";
-    cancel.onclick = () => modal.style.display = "none";
-    window.onclick = e => { if (e.target === modal) modal.style.display = "none"; };
-  });
+const modal=document.getElementById("modalEditar");
+document.getElementById("closeModal").onclick=()=>modal.style.display="none";
+document.getElementById("cancelarEdicion").onclick=()=>modal.style.display="none";
+window.onclick=e=>{if(e.target===modal)modal.style.display="none"};
+});
 </script>
 
 </body>
