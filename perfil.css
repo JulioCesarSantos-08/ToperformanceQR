@@ -1,230 +1,218 @@
-/* ======== General ======== */
-body {
-  font-family: 'Poppins', 'Segoe UI', sans-serif;
-  margin: 0;
-  padding: 0;
-  background: #f4f5fa;
-  color: #222;
-  line-height: 1.6;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+body{
+font-family:'Poppins','Segoe UI',sans-serif;
+margin:0;
+padding:0;
+background:#f4f5fa;
+color:#222;
+line-height:1.6;
+display:flex;
+flex-direction:column;
+align-items:center;
 }
 
-/* ======== Header ======== */
-header {
-  background: linear-gradient(90deg, #d00000, #ff4d4d);
-  color: white;
-  width: 100%;
-  padding: 15px 25px;
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
-  gap: 15px;
-  box-shadow: 0 3px 10px rgba(0,0,0,0.15);
+header{
+background:linear-gradient(90deg,#d00000,#ff4d4d);
+color:white;
+width:100%;
+padding:12px 18px;
+display:flex;
+align-items:center;
+justify-content:space-between;
+box-shadow:0 3px 10px rgba(0,0,0,.15);
 }
 
-header img {
-  height: 55px;
+header img{
+height:45px;
 }
 
-header .header-right {
-  display: flex;
-  align-items: center;
-  gap: 15px;
+.header-right{
+display:flex;
+align-items:center;
+gap:10px;
 }
 
-#bienvenido {
-  font-weight: 600;
-  font-size: 1.1rem;
+#bienvenido{
+font-weight:600;
+font-size:1rem;
 }
 
-/* ======== Layout ======== */
-.container {
-  width: 100%;
-  max-width: 1100px;
-  padding: 25px;
-  box-sizing: border-box;
+.container{
+width:100%;
+max-width:1100px;
+padding:20px;
+box-sizing:border-box;
 }
 
-@media (max-width: 850px) {
-  .container {
-    padding: 15px;
-  }
+.cliente-card{
+background:#fff;
+border-radius:18px;
+padding:20px;
+box-shadow:0 6px 18px rgba(0,0,0,.12);
+margin-bottom:25px;
 }
 
-/* ======== Tarjeta Cliente ======== */
-.cliente-card {
-  background: #fff;
-  border-radius: 15px;
-  padding: 25px;
-  box-shadow: 0 6px 18px rgba(0,0,0,0.1);
-  margin-bottom: 25px;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+.cliente-card h3{
+margin:0;
+font-size:1.2rem;
 }
 
-.cliente-card:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 8px 22px rgba(0,0,0,0.15);
+.cliente-card p{
+margin:6px 0;
+font-size:.95rem;
 }
 
-.cliente-card img {
-  width: 100%;
-  max-width: 260px;
-  border-radius: 12px;
-  margin: 10px 0;
-  display: block;
+.cliente-card img{
+width:100%;
+max-width:260px;
+border-radius:14px;
+margin:12px 0;
+display:block;
 }
 
-/* ======== Historial de Servicios ======== */
-.historial-container {
-  background: #fff;
-  border-radius: 15px;
-  padding: 25px;
-  box-shadow: 0 6px 18px rgba(0,0,0,0.1);
-  overflow-x: auto;
-  margin-top: 20px;
+.tabla-servicios{
+width:100%;
+border-collapse:collapse;
+margin-top:15px;
 }
 
-.historial-container h2 {
-  color: #d00000;
-  margin-top: 0;
-  font-size: 1.3rem;
-  display: flex;
-  align-items: center;
-  gap: 8px;
+.tabla-servicios th,
+.tabla-servicios td{
+border:1px solid #ddd;
+padding:10px;
+text-align:center;
 }
 
-/* ======== Tabla ======== */
-.historial-table {
-  width: 100%;
-  border-collapse: collapse;
-  margin-top: 15px;
-  font-size: 0.95rem;
-  border: 2px solid #ccc;
-  border-radius: 8px;
-  overflow: hidden;
-  text-align: center;
+.tabla-servicios th{
+background:#d00000;
+color:white;
 }
 
-.historial-table th,
-.historial-table td {
-  border: 1px solid #ddd;
-  padding: 12px 10px;
-  vertical-align: middle;
+button{
+background:#000;
+color:white;
+padding:10px 22px;
+border:none;
+border-radius:10px;
+cursor:pointer;
+margin:6px 0;
+font-weight:600;
+transition:.2s;
 }
 
-.historial-table th {
-  background: #f2f2f2;
-  font-weight: 600;
-  color: #333;
+button:hover{
+background:#333;
+transform:scale(1.05);
 }
 
-.historial-table tr:nth-child(even) {
-  background: #fafafa;
+button.danger{
+background:#c9302c;
 }
 
-.historial-table tr:hover {
-  background: #ffecec;
-  transition: background 0.2s ease;
+.modal{
+display:none;
+position:fixed;
+inset:0;
+background:rgba(0,0,0,.6);
+justify-content:center;
+align-items:center;
+z-index:1000;
 }
 
-/* ======== Colores dinámicos de fechas ======== */
-.fecha-verde {
-  color: #1e7d32;
-  font-weight: 600;
+.modal-content{
+background:white;
+padding:25px;
+border-radius:15px;
+width:90%;
+max-width:420px;
+box-shadow:0 6px 25px rgba(0,0,0,.3);
 }
 
-.fecha-naranja {
-  color: #f57c00;
-  font-weight: 600;
+.modal-content input{
+width:100%;
+padding:12px;
+margin:10px 0;
+border:1px solid #ccc;
+border-radius:8px;
 }
 
-.fecha-roja {
-  color: #d32f2f;
-  font-weight: 600;
+.modal-actions{
+display:flex;
+justify-content:flex-end;
+gap:10px;
 }
 
-/* ======== Botones ======== */
-button {
-  background: linear-gradient(90deg, #000, #333);
-  color: white;
-  padding: 10px 22px;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  margin: 6px 0;
-  font-weight: 600;
-  transition: background 0.3s ease, transform 0.2s ease;
+.servicio-card{
+background:white;
+border-radius:15px;
+padding:15px;
+margin:12px 0;
+box-shadow:0 4px 12px rgba(0,0,0,.12);
 }
 
-button:hover {
-  background: linear-gradient(90deg, #111, #444);
-  transform: scale(1.03);
+.servicio-card h4{
+margin:0;
+color:#d00000;
+font-size:1rem;
 }
 
-button.danger {
-  background: linear-gradient(90deg, #d9534f, #b52b27);
+.servicio-card small{
+display:block;
+opacity:.7;
+margin:4px 0;
 }
 
-button.danger:hover {
-  background: linear-gradient(90deg, #c9302c, #a11f1b);
+.servicio-card b{
+font-size:1.1rem;
 }
 
-/* ======== Modal ======== */
-.modal {
-  display: none;
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.6);
-  justify-content: center;
-  align-items: center;
-  z-index: 1000;
+.fab{
+position:fixed;
+right:20px;
+bottom:20px;
+width:56px;
+height:56px;
+border-radius:50%;
+background:#d00000;
+color:white;
+border:none;
+font-size:28px;
+box-shadow:0 5px 15px rgba(0,0,0,.3);
 }
 
-.modal-content {
-  background: #fff;
-  padding: 30px;
-  border-radius: 15px;
-  width: 90%;
-  max-width: 450px;
-  box-shadow: 0 6px 25px rgba(0,0,0,0.3);
-  animation: fadeIn 0.3s ease;
+@media(max-width:768px){
+
+header{
+padding:10px 15px;
 }
 
-.modal-content h2 {
-  margin-top: 0;
-  color: #d00000;
+header h1{
+font-size:1.1rem;
 }
 
-.modal-content input {
-  width: 100%;
-  padding: 12px;
-  margin: 10px 0;
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  font-size: 0.95rem;
+.container{
+padding:15px;
 }
 
-.modal-content .modal-actions {
-  display: flex;
-  justify-content: flex-end;
-  gap: 10px;
-  margin-top: 18px;
+.tabla-servicios{
+display:none;
 }
 
-/* ======== Animaciones ======== */
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(-15px); }
-  to { opacity: 1; transform: translateY(0); }
+.cliente-card{
+padding:18px;
 }
 
-/* ======== Responsividad ======== */
-@media (max-width: 600px) {
-  .historial-table th,
-  .historial-table td {
-    padding: 8px;
-    font-size: 0.85rem;
-  }
+.cliente-card p{
+font-size:.9rem;
+}
+}
+
+@media(max-width:600px){
+
+header img{
+height:40px;
+}
+
+#bienvenido{
+font-size:.9rem;
+}
 }
