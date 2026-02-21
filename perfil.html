@@ -1,68 +1,62 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Perfil - ToPerformance</title>
-  <link rel="stylesheet" href="perfil.css">
-  <link rel="icon" href="imagenes/logo1.png" />
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Perfil - ToPerformance</title>
+<link rel="stylesheet" href="perfil.css">
+<link rel="icon" type="image/png" href="imagenes/logo1.png">
 </head>
+
 <body>
-  <header>
-    <div class="header-left">
-      <img src="imagenes/logo1.png" alt="Logo Taller">
-      <h1>ToPerformance</h1>
-    </div>
-    <div class="header-right">
-      <span id="bienvenido">Bienvenido</span>
-      <button onclick="logout()">Cerrar sesión</button>
-    </div>
-  </header>
 
-  <main class="container">
-    <!-- =========================
-         Panel de administración
-    ========================== -->
-    <section id="panelAdmin">
-      <form id="adminForm">
-        <h2>Registrar Cliente</h2>
-        <input type="text" id="nombre" placeholder="Nombre completo" required>
-        <input type="email" id="correo" placeholder="Correo electrónico" required>
-        <input type="password" id="password" placeholder="Contraseña (opcional)">
-        <input type="text" id="modelo" placeholder="Modelo del vehículo" required>
-        <input type="text" id="placa" placeholder="Placa del vehículo" required>
-        <input type="text" id="imagen" placeholder="Nombre del archivo de imagen (opcional)">
-        <button type="button" onclick="altaCliente()">Guardar Cliente</button>
-        <p class="nota">* Solo el administrador puede registrar nuevos clientes.</p>
-      </form>
-    </section>
+<header>
+<img src="imagenes/logo1.png">
+<span id="bienvenido">Bienvenido</span>
+<button onclick="logout()">Salir</button>
+</header>
 
-    <!-- =========================
-         Contenido dinámico
-    ========================== -->
-    <section id="contenido"></section>
-  </main>
+<main class="container">
 
-  <!-- =========================
-       Modal de edición
-  ========================== -->
-  <div id="modalEditar" class="modal">
-    <div class="modal-content">
-      <h2>Editar Cliente</h2>
-      <form id="editForm" onsubmit="guardarEdicionCliente(event)">
-        <input type="text" id="editNombre" placeholder="Nombre">
-        <input type="email" id="editCorreo" placeholder="Correo">
-        <input type="text" id="editModelo" placeholder="Modelo">
-        <input type="text" id="editPlaca" placeholder="Placa">
-        <input type="text" id="editImagen" placeholder="Imagen">
-        <div class="modal-actions">
-          <button type="submit">Guardar</button>
-          <button type="button" onclick="closeModal()">Cancelar</button>
-        </div>
-      </form>
-    </div>
-  </div>
+<section id="panelAdmin">
+<form id="adminForm">
+<h3>Registrar Cliente</h3>
+<input id="nombre" placeholder="Nombre completo" required>
+<input id="correo" type="email" placeholder="Correo" required>
+<input id="password" type="password" placeholder="Contraseña opcional">
+<input id="modelo" placeholder="Modelo vehículo" required>
+<input id="placa" placeholder="Placa" required>
+<input id="kilometraje" placeholder="Kilometraje actual" required>
+<input id="imagen" placeholder="Imagen opcional">
+<button type="button" onclick="altaCliente()">Guardar</button>
+</form>
+</section>
 
-  <script type="module" src="perfil.js"></script>
+<section id="contenido"></section>
+
+</main>
+
+<div id="modalEditar" class="modal">
+<div class="modal-content">
+<h3>Editar Cliente</h3>
+<form onsubmit="guardarEdicionCliente(event)">
+<input id="editNombre" placeholder="Nombre">
+<input id="editCorreo" placeholder="Correo">
+<input id="editModelo" placeholder="Modelo">
+<input id="editPlaca" placeholder="Placa">
+<input id="editKilometraje" placeholder="Kilometraje">
+<input id="editImagen" placeholder="Imagen">
+<div class="modal-actions">
+<button type="submit">Guardar</button>
+<button type="button" onclick="closeModal()">Cancelar</button>
+</div>
+</form>
+</div>
+</div>
+
+<button class="fab">+</button>
+
+<script type="module" src="perfil.js"></script>
+
 </body>
 </html>
