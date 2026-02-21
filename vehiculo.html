@@ -1,33 +1,43 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <title>Mi Vehículo</title>
-  <script type="module" src="vehiculo.js"></script>
-  <link rel="stylesheet" href="vehiculo.css">
-  <link rel="icon" href="imagenes/logo1.png" />
+<meta charset="UTF-8">
+<title>Mi Vehículo</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="vehiculo.css">
+<script type="module" src="vehiculo.js"></script>
 </head>
+
 <body>
-  <!-- Encabezado -->
-  <header class="header">
+
+<header class="header">
+  <div class="header-left">
     <h1>Mi Vehículo</h1>
-    <div class="user-bar">
-      <span id="nombreUsuario"></span>
-      <button id="logoutBtn">Cerrar Sesión</button>
-    </div>
-  </header>
+  </div>
+  <div class="user-bar">
+    <span id="nombreUsuario"></span>
+    <button id="logoutBtn">Cerrar Sesión</button>
+  </div>
+</header>
 
-  <!-- Contenedor principal -->
-  <main class="contenedor">
-    <!-- Info del cliente -->
-    <section id="infoCliente" class="card info"></section>
+<main class="contenedor">
 
-    <!-- Historial de servicios -->
-    <section id="historialServicios" class="card servicios">
+  <section id="infoCliente" class="card info">
+    <!-- vehiculo.js llena esto -->
+  </section>
+
+  <section id="historialServicios" class="card servicios">
+    <div class="servicios-header">
       <h3>Historial de Servicios</h3>
-      <div id="listaServicios"></div>
-      <button id="btnNuevoServicio" style="display:none;">➕ Agregar nuevo servicio</button>
-    </section>
-  </main>
+      <span id="estadoGeneral" class="estado-badge"></span>
+    </div>
+
+    <div id="listaServicios"></div>
+  </section>
+
+</main>
+
+<button id="btnNuevoServicio" class="fab" style="display:none;">＋</button>
+
 </body>
 </html>
