@@ -30,6 +30,13 @@ position:relative
 position:absolute;top:12px;right:16px;font-size:20px;
 background:transparent;border:none;cursor:pointer
 }
+#vehiculoSelect{
+width:100%;
+margin-top:10px;
+padding:8px;
+border-radius:8px;
+border:1px solid #ccc;
+}
 </style>
 </head>
 
@@ -72,13 +79,20 @@ background:transparent;border:none;cursor:pointer
 <input type="text" id="buscadorSelectServicios" placeholder="Buscar cliente...">
 
 <form id="formServicio">
+
 <select id="clienteSelect" size="6" required></select>
+
+<select id="vehiculoSelect" size="4" required>
+<option value="">Selecciona un vehículo</option>
+</select>
+
 <input type="text" id="servicioNombre" placeholder="Nombre del servicio" required>
 <input type="date" id="servicioFecha" required>
 <input type="number" id="servicioCosto" placeholder="Costo" required>
 <input type="number" id="servicioKilometraje" placeholder="Kilometraje actual" required>
 <textarea id="servicioDescripcion" placeholder="Descripción"></textarea>
 <button type="submit">Guardar Servicio</button>
+
 </form>
 </section>
 
