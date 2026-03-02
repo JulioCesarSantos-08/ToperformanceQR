@@ -16,41 +16,56 @@ const app=initializeApp(firebaseConfig)
 const db=getDatabase(app)
 const auth=getAuth(app)
 
+const clienteSelect=document.getElementById("clienteSelect")
+const vehiculoSelect=document.getElementById("vehiculoSelect")
+
 onAuthStateChanged(auth,async user=>{
 if(!user){window.location.href="index.html";return}
-const adminSnap=await get(ref(db,"admins/"+user.uid))
-if(!adminSnap.exists()){window.location.href="perfil.html";return}
 adminEmail.innerText=user.email
 })
 
-logoutBtn.onclick=async()=>{await signOut(auth);window.location.href="index.html"}
+logoutBtn.onclick=async()=>{
+await signOut(auth)
+window.location.href="index.html"
+}
 
 formAltaCliente.addEventListener("submit",async e=>{
 e.preventDefault()
 
 const nombre=nombreCliente.value.trim()
 const correo=emailCliente.value.trim()
+const telefono=telefonoCliente.value.trim()
 const password=passwordCliente.value.trim()
 const marca=marcaVehiculo.value.trim()
 const modelo=modeloVehiculo.value.trim()
 const anio=anioVehiculo.value.trim()
-const placa=placaVehiculo.value.trim()
+const placa=placaVehiculo.value.trim().toUpperCase()
 const kilometraje=kilometrajeVehiculo.value.trim()
 const imagen=imagenVehiculo.value.trim()
 
 if(!nombre||!correo||!modelo||!placa||!kilometraje)return
 
-const key=correo.replace(/[.#$[\]@]/g,"_")
-const existe=await get(ref(db,"clientes/"+key))
+const clienteKey=correo.replace(/[.#$[\]@]/g,"_")
+const clienteRef=ref(db,"clientes/"+clienteKey)
+const snap=await get(clienteRef)
 
-if(!existe.exists()&&password){
+if(!snap.exists() && password){
 try{await createUserWithEmailAndPassword(auth,correo,password)}catch{}
 }
 
-await update(ref(db,"clientes/"+key),{
+await update(clienteRef,{
 nombre,
 email:correo,
-vehiculo:{marca,modelo,anio,placa,kilometraje,imagen:imagen||"defaultcar.png"}
+telefono
+})
+
+await update(ref(db,`clientes/${clienteKey}/vehiculos/${placa}`),{
+marca,
+modelo,
+anio,
+placa,
+kilometraje,
+imagen:imagen||"defaultcar.png"
 })
 
 formAltaCliente.reset()
@@ -60,6 +75,7 @@ cargarClientes()
 async function cargarClientes(){
 listaClientes.innerHTML=""
 clienteSelect.innerHTML=""
+vehiculoSelect.innerHTML="<option value=''>Selecciona un vehículo</option>"
 
 const snap=await get(ref(db,"clientes"))
 if(!snap.exists())return
@@ -68,69 +84,95 @@ snap.forEach(c=>{
 const cli=c.val()
 const key=c.key
 
+let vehiculosHTML=""
+
+if(cli.vehiculos){
+Object.values(cli.vehiculos).forEach(v=>{
+vehiculosHTML+=`
+<div style="margin-top:10px;padding:10px;border:1px solid #eee;border-radius:8px">
+<p><b>${v.marca||""} ${v.modelo}</b> (${v.placa})</p>
+<p>Kilometraje: ${v.kilometraje||0} km</p>
+<img src="imagenes/${v.imagen}" style="max-width:200px;border-radius:8px">
+<button onclick="verInformacion('${key}','${v.placa}')">Información</button>
+</div>
+`
+})
+}
+
 const div=document.createElement("div")
 div.className="cliente-card"
-
 div.innerHTML=`
 <h3>${cli.nombre}</h3>
 <p>Email: ${cli.email}</p>
-<p>Vehículo: ${cli.vehiculo.modelo} (${cli.vehiculo.placa})</p>
-<p>Kilometraje: ${cli.vehiculo.kilometraje||0} km</p>
-<img src="imagenes/${cli.vehiculo.imagen}" style="max-width:200px;border-radius:8px">
-<div class="btns">
-<button onclick="verInformacion('${key}')">Información</button>
-<button onclick="editarCliente('${key}')">Editar</button>
-<button class="danger" onclick="eliminarCliente('${key}')">Eliminar</button>
-</div>
+<p>Teléfono: ${cli.telefono||""}</p>
+${vehiculosHTML}
 <hr>
+<button onclick="editarCliente('${key}')">Editar Cliente</button>
+<button class="danger" onclick="eliminarCliente('${key}')">Eliminar Cliente</button>
 `
 
 listaClientes.appendChild(div)
 
 const opt=document.createElement("option")
 opt.value=key
-opt.textContent=cli.nombre+" - "+cli.vehiculo.modelo
+opt.textContent=cli.nombre+" - "+cli.email
 clienteSelect.appendChild(opt)
 })
 }
-cargarClientes()
+
+clienteSelect.addEventListener("change",async ()=>{
+vehiculoSelect.innerHTML="<option value=''>Selecciona un vehículo</option>"
+
+const clienteKey=clienteSelect.value
+if(!clienteKey)return
+
+const snap=await get(ref(db,`clientes/${clienteKey}/vehiculos`))
+if(!snap.exists())return
+
+snap.forEach(v=>{
+const data=v.val()
+const opt=document.createElement("option")
+opt.value=v.key
+opt.textContent=`${data.marca||""} ${data.modelo} (${data.placa})`
+vehiculoSelect.appendChild(opt)
+})
+})
 
 formServicio.addEventListener("submit",async e=>{
 e.preventDefault()
 
 const clienteKey=clienteSelect.value
+const vehiculoId=vehiculoSelect.value
 const nombre=servicioNombre.value.trim()
 const fecha=servicioFecha.value
 const descripcion=servicioDescripcion.value.trim()
 const costo=servicioCosto.value.trim()
 const kilometraje=servicioKilometraje.value.trim()
 
-if(!clienteKey||!nombre||!fecha||!costo||!kilometraje)return
+if(!clienteKey||!vehiculoId||!nombre||!fecha||!costo||!kilometraje){
+alert("Completa todos los campos y selecciona vehículo")
+return
+}
 
-await push(ref(db,"clientes/"+clienteKey+"/servicios"),{
+await push(ref(db,`clientes/${clienteKey}/vehiculos/${vehiculoId}/servicios`),{
 nombre,fecha,descripcion,costo,kilometraje
 })
 
-await update(ref(db,"clientes/"+clienteKey+"/vehiculo"),{kilometraje})
+await update(ref(db,`clientes/${clienteKey}/vehiculos/${vehiculoId}`),{
+kilometraje
+})
 
 formServicio.reset()
-cargarClientes()
+alert("Servicio registrado correctamente")
 })
 
 window.editarCliente=async key=>{
 const snap=await get(ref(db,"clientes/"+key))
 if(!snap.exists())return
-
 const c=snap.val()
 editNombre.value=c.nombre
 editCorreo.value=c.email
-editMarca.value=c.vehiculo.marca||""
-editModelo.value=c.vehiculo.modelo
-editAnio.value=c.vehiculo.anio||""
-editPlaca.value=c.vehiculo.placa
-editKilometraje.value=c.vehiculo.kilometraje||""
-editImagen.value=c.vehiculo.imagen||""
-
+editTelefono.value=c.telefono||""
 modalEditar.style.display="flex"
 window.clienteEditandoKey=key
 }
@@ -143,14 +185,7 @@ if(!key)return
 await update(ref(db,"clientes/"+key),{
 nombre:editNombre.value.trim(),
 email:editCorreo.value.trim(),
-vehiculo:{
-marca:editMarca.value.trim(),
-modelo:editModelo.value.trim(),
-anio:editAnio.value.trim(),
-placa:editPlaca.value.trim(),
-kilometraje:editKilometraje.value.trim(),
-imagen:editImagen.value.trim()||"defaultcar.png"
-}
+telefono:editTelefono.value.trim()
 })
 
 modalEditar.style.display="none"
@@ -158,35 +193,28 @@ cargarClientes()
 })
 
 window.eliminarCliente=async key=>{
-if(confirm("¿Eliminar este cliente y su historial?")){
+if(confirm("¿Eliminar este cliente y todos sus vehículos?")){
 await remove(ref(db,"clientes/"+key))
 cargarClientes()
 }
 }
 
-window.verInformacion=async key=>{
-const snap=await get(ref(db,"clientes/"+key))
+window.verInformacion=async (clienteKey,placa)=>{
+const snap=await get(ref(db,`clientes/${clienteKey}/vehiculos/${placa}`))
 if(!snap.exists())return
 
-const cli=snap.val()
-const servSnap=await get(ref(db,"clientes/"+key+"/servicios"))
-const servicios=servSnap.exists()?Object.values(servSnap.val()):[]
-
-let ultimoKm=null
+const vehiculo=snap.val()
+const servicios=vehiculo.servicios?Object.values(vehiculo.servicios):[]
 
 const filas=servicios.map(s=>{
-let diff=""
-if(ultimoKm)diff=` (+${s.kilometraje-ultimoKm} km)`
-ultimoKm=s.kilometraje
 const estado=estadoFecha(s.fecha)
-
 return`
 <tr>
 <td>${s.fecha}</td>
 <td>${s.nombre}</td>
 <td>${s.descripcion||""}</td>
 <td>$${s.costo}</td>
-<td>${s.kilometraje}${diff}</td>
+<td>${s.kilometraje}</td>
 <td style="color:${estado.color};font-weight:600">${estado.texto}</td>
 </tr>`
 }).join("")
@@ -195,7 +223,7 @@ const modal=document.createElement("div")
 modal.className="modal-info"
 modal.innerHTML=`
 <div class="modal-content">
-<h2>${cli.nombre}</h2>
+<h2>${vehiculo.marca} ${vehiculo.modelo} (${placa})</h2>
 <table class="tabla-servicios">
 <thead><tr><th>Fecha</th><th>Servicio</th><th>Desc</th><th>Costo</th><th>Km</th><th>Estado</th></tr></thead>
 <tbody>${filas}</tbody>
@@ -203,7 +231,6 @@ modal.innerHTML=`
 <button class="cerrar-modal">Cerrar</button>
 </div>
 `
-
 document.body.appendChild(modal)
 modal.querySelector(".cerrar-modal").onclick=()=>modal.remove()
 modal.onclick=e=>{if(e.target===modal)modal.remove()}
@@ -217,3 +244,5 @@ if(meses<=2)return{color:"green",texto:"Cambio en buen estado"}
 if(meses<=3)return{color:"orange",texto:"Cambio próximo"}
 return{color:"red",texto:"Se necesita cambio"}
 }
+
+cargarClientes()
