@@ -2,109 +2,214 @@ body{
 font-family:Poppins,Arial,sans-serif;
 background:#f4f5fa;
 margin:0;
+color:#222;
 }
+
+/* HEADER */
 
 .header{
 background:#d00000;
 color:white;
-padding:12px 16px;
+padding:14px 22px;
 display:flex;
 justify-content:space-between;
 align-items:center;
-box-shadow:0 3px 10px rgba(0,0,0,.2);
+box-shadow:0 4px 15px rgba(0,0,0,.2);
+}
+
+.header h1{
+margin:0;
+font-size:1.2rem;
+letter-spacing:.5px;
 }
 
 .header button{
 background:black;
 color:white;
 border:none;
-padding:8px 12px;
-border-radius:8px;
+padding:8px 16px;
+border-radius:12px;
 cursor:pointer;
+font-weight:500;
+transition:.2s;
 }
+
+.header button:hover{
+opacity:.85;
+}
+
+/* GRID */
 
 .container{
 display:grid;
 grid-template-columns:repeat(3,1fr);
-gap:18px;
-padding:18px;
+gap:22px;
+padding:22px;
+max-width:1450px;
+margin:auto;
 }
+
+/* CARDS */
 
 .card{
 background:white;
-padding:18px;
-border-radius:16px;
-box-shadow:0 4px 12px rgba(0,0,0,.12);
+padding:24px;
+border-radius:20px;
+box-shadow:0 6px 18px rgba(0,0,0,.12);
+transition:.2s;
+}
+
+.card:hover{
+transform:translateY(-4px);
+box-shadow:0 10px 25px rgba(0,0,0,.15);
 }
 
 .card h2{
 margin-top:0;
 color:#d00000;
+font-size:1.25rem;
+font-weight:700;
 }
+
+/* INPUTS */
 
 .card input,
 .card textarea,
 .card select{
 width:100%;
-margin:8px 0;
-padding:12px;
-border-radius:10px;
-border:1px solid #ccc;
+margin:10px 0;
+padding:13px;
+border-radius:14px;
+border:1px solid #ddd;
 font-size:15px;
+transition:.2s;
+}
+
+.card input:focus,
+.card textarea:focus,
+.card select:focus{
+border-color:#d00000;
+box-shadow:0 0 8px rgba(208,0,0,.2);
+outline:none;
 }
 
 .card textarea{
 resize:none;
-height:70px;
+min-height:90px;
 }
 
 .card button{
 background:#d00000;
 color:white;
 border:none;
-padding:12px;
-border-radius:10px;
+padding:14px;
+border-radius:14px;
 cursor:pointer;
 font-weight:600;
 width:100%;
+transition:.2s;
 }
 
 .card button:hover{
-opacity:.9;
+background:#a80000;
 }
+
+/* CLIENTES */
 
 .cliente-card{
-background:#fafafa;
-padding:12px;
-border-radius:12px;
-margin-bottom:12px;
-border:1px solid #ddd;
+background:white;
+padding:22px;
+border-radius:18px;
+margin-bottom:26px;
+border:1px solid #eee;
+box-shadow:0 4px 14px rgba(0,0,0,.06);
+transition:.2s;
 }
 
+.cliente-card:hover{
+transform:translateY(-4px);
+box-shadow:0 10px 25px rgba(0,0,0,.12);
+}
+
+/* 🔥 AQUÍ ESTÁ LA MEJORA DEL NOMBRE */
+
 .cliente-card h3{
-margin:0;
-color:#d00000;
+margin:0 0 14px 0;
+font-size:1.15rem;
+font-weight:700;
+color:#111;              /* quitamos rojo fuerte */
+letter-spacing:.6px;
+line-height:1.4;
+text-transform:capitalize; /* mejora visual si vienen en mayúsculas */
 }
 
 .cliente-card p{
-margin:4px 0;
+margin:6px 0;
 font-size:.9rem;
+color:#555;
 }
+
+.cliente-card hr{
+margin:20px 0;
+border:none;
+border-top:1px solid #eee;
+}
+
+/* VEHÍCULOS */
+
+.vehiculo-card{
+margin-top:18px;
+padding:18px;
+border-radius:16px;
+background:#fafafa;
+border:1px solid #eee;
+transition:.2s;
+}
+
+.vehiculo-card:hover{
+background:#f2f2f2;
+}
+
+.vehiculo-card h4{
+margin:0 0 8px 0;
+font-size:.95rem;
+font-weight:600;
+color:#d00000;
+}
+
+.vehiculo-card p{
+margin:4px 0;
+font-size:.85rem;
+color:#444;
+}
+
+.vehiculo-card img{
+width:100%;
+max-width:280px;
+height:auto;
+border-radius:14px;
+margin-top:10px;
+object-fit:cover;
+display:block;
+}
+
+/* BOTONES */
 
 .btns{
 display:flex;
-gap:6px;
-margin-top:10px;
+gap:10px;
+margin-top:12px;
 }
 
 .btns button{
 flex:1;
-padding:8px;
-border-radius:8px;
+padding:10px;
+border-radius:12px;
 border:none;
 cursor:pointer;
 color:white;
 font-weight:600;
+transition:.2s;
 }
 
 .btns .danger{
@@ -114,6 +219,12 @@ background:#444;
 .btns button:not(.danger){
 background:#d00000;
 }
+
+.btns button:hover{
+opacity:.85;
+}
+
+/* MODAL */
 
 #modalEditar{
 display:none;
@@ -127,25 +238,25 @@ z-index:2000;
 
 .editar-form{
 background:white;
-padding:20px;
-border-radius:16px;
+padding:28px;
+border-radius:20px;
 width:90%;
-max-width:500px;
-box-shadow:0 6px 25px rgba(0,0,0,.3);
+max-width:520px;
+box-shadow:0 10px 30px rgba(0,0,0,.3);
 }
 
 .editar-form input{
 width:100%;
 padding:12px;
-border-radius:10px;
-border:1px solid #ccc;
-margin:6px 0;
+border-radius:12px;
+border:1px solid #ddd;
+margin:10px 0;
 }
 
 .botones{
 display:flex;
-gap:10px;
-margin-top:15px;
+gap:12px;
+margin-top:18px;
 }
 
 .botones button{
@@ -153,9 +264,11 @@ flex:1;
 background:#d00000;
 color:white;
 border:none;
-padding:12px;
-border-radius:10px;
+padding:13px;
+border-radius:12px;
 }
+
+/* MODAL INFO */
 
 .modal-info{
 position:fixed;
@@ -169,26 +282,27 @@ z-index:3000;
 
 .modal-content{
 background:white;
-padding:20px;
-border-radius:16px;
-width:90%;
-max-width:700px;
+padding:28px;
+border-radius:20px;
+width:95%;
+max-width:850px;
 max-height:90vh;
 overflow:auto;
-box-shadow:0 5px 25px rgba(0,0,0,.3);
+box-shadow:0 10px 30px rgba(0,0,0,.3);
 }
 
 .tabla-servicios{
 width:100%;
 border-collapse:collapse;
-margin-top:10px;
+margin-top:18px;
 }
 
 .tabla-servicios th,
 .tabla-servicios td{
-border:1px solid #ccc;
-padding:8px;
+border:1px solid #ddd;
+padding:12px;
 font-size:.9rem;
+text-align:center;
 }
 
 .tabla-servicios th{
@@ -197,13 +311,22 @@ color:white;
 }
 
 .cerrar-modal{
-margin-top:15px;
+margin-top:18px;
 background:#d00000;
 color:white;
 border:none;
-padding:10px 20px;
-border-radius:10px;
+padding:14px;
+border-radius:14px;
 width:100%;
+cursor:pointer;
+}
+
+/* RESPONSIVE */
+
+@media(max-width:1200px){
+.container{
+grid-template-columns:repeat(2,1fr);
+}
 }
 
 @media(max-width:900px){
@@ -214,33 +337,44 @@ grid-template-columns:1fr;
 
 @media(max-width:600px){
 
+.header{
+flex-direction:column;
+align-items:flex-start;
+gap:8px;
+}
+
 .header h1{
 font-size:1rem;
 }
 
+.container{
+padding:16px;
+}
+
 .card{
-padding:15px;
+padding:18px;
 }
 
 .card input,
 .card textarea,
 .card select{
 font-size:14px;
-padding:10px;
+padding:11px;
 }
 
-.cliente-card{
-padding:10px;
+.vehiculo-card img{
+max-width:100%;
 }
 
-.btns button{
-font-size:.8rem;
-padding:6px;
+.tabla-servicios{
+display:block;
+overflow-x:auto;
+white-space:nowrap;
 }
 
 .tabla-servicios th,
 .tabla-servicios td{
 font-size:.8rem;
-padding:6px;
+padding:8px;
 }
 }
