@@ -46,29 +46,15 @@ async function buscarClientePorCorreo(correo){
 const key=correo.replace(/[.#$[\]@]/g,"_")
 const snap=await get(ref(db,"clientes/"+key))
 
-if(snap.exists()){
+if(!snap.exists()){
+contenidoDiv.innerHTML="<p>No se encontraron datos de tu cuenta.</p>"
+return
+}
+
 const cliente=snap.val()
 clienteActivoKey=key
 document.getElementById("bienvenido").innerText=`Bienvenido, ${cliente.nombre}`
 mostrarCliente(key,cliente)
-return
-}
-
-const allSnap=await get(ref(db,"clientes"))
-if(allSnap.exists()){
-let encontrado=null,k=null
-allSnap.forEach(c=>{
-if(c.val().email===correo){encontrado=c.val();k=c.key}
-})
-if(encontrado){
-clienteActivoKey=k
-document.getElementById("bienvenido").innerText=`Bienvenido, ${encontrado.nombre}`
-mostrarCliente(k,encontrado)
-return
-}
-}
-
-contenidoDiv.innerHTML="<p>No se encontraron datos de tu cuenta.</p>"
 }
 
 window.logout=function(){
@@ -76,35 +62,6 @@ signOut(auth).then(()=>{
 localStorage.clear()
 window.location.href="index.html"
 })
-}
-
-window.altaCliente=async function(){
-if(!esAdmin)return
-
-const nombre=document.getElementById("nombre").value.trim()
-const correo=document.getElementById("correo").value.trim()
-const password=document.getElementById("password").value.trim()
-const modelo=document.getElementById("modelo").value.trim()
-const placa=document.getElementById("placa").value.trim()
-const kilometraje=document.getElementById("kilometraje")?document.getElementById("kilometraje").value.trim():""
-const imagen=document.getElementById("imagen").value.trim()
-
-if(!nombre||!correo||!modelo||!placa)return
-
-const key=correo.replace(/[.#$[\]@]/g,"_")
-
-if(password){
-try{await createUserWithEmailAndPassword(auth,correo,password)}catch{}
-}
-
-await set(ref(db,"clientes/"+key),{
-nombre,
-email:correo,
-vehiculo:{modelo,placa,kilometraje,imagen:imagen||"defaultcar.png"}
-})
-
-adminForm.reset()
-cargarTodosClientes()
 }
 
 async function cargarTodosClientes(){
@@ -121,12 +78,29 @@ div.classList.add("cliente-card")
 div.innerHTML=`
 <h3>${cliente.nombre}</h3>
 <p><b>Email:</b> ${cliente.email}</p>
-<p><b>Vehículo:</b> ${cliente.vehiculo.modelo} (${cliente.vehiculo.placa})</p>
-<p><b>Kilometraje:</b> ${cliente.vehiculo.kilometraje||"No registrado"} km</p>
-<img src="imagenes/${cliente.vehiculo.imagen}">
-<input placeholder="Buscar servicio por nombre o fecha..." oninput="filtrarServicios('${key}', this.value)">
-<div id="servicios-${key}"></div>
 `
+
+if(cliente.vehiculos){
+Object.entries(cliente.vehiculos).forEach(([vehiculoId,v])=>{
+
+const vehiculoDiv=document.createElement("div")
+vehiculoDiv.style.marginTop="20px"
+vehiculoDiv.style.padding="15px"
+vehiculoDiv.style.border="1px solid #eee"
+vehiculoDiv.style.borderRadius="12px"
+
+vehiculoDiv.innerHTML=`
+<h4>${v.marca||""} ${v.modelo} (${v.placa})</h4>
+<p><b>Kilometraje:</b> ${v.kilometraje||0} km</p>
+<img src="imagenes/${v.imagen}" style="max-width:250px;border-radius:12px;margin:10px 0">
+<div id="servicios-${vehiculoId}"></div>
+`
+
+div.appendChild(vehiculoDiv)
+
+cargarServicios(key,vehiculoId)
+})
+}
 
 if(esAdmin){
 const btnEditar=document.createElement("button")
@@ -143,7 +117,6 @@ div.appendChild(btnEliminar)
 }
 
 contenidoDiv.appendChild(div)
-cargarServicios(key)
 }
 
 function calcularEstado(fechaStr){
@@ -156,106 +129,75 @@ if(diffMeses<=3)return{color:"orange",texto:"El cambio deberá realizarse pronto
 return{color:"red",texto:"Se necesita realizar el cambio"}
 }
 
-async function cargarServicios(clienteKey){
-const cont=document.getElementById("servicios-"+clienteKey)
-clienteActivoKey=clienteKey
-const snap=await get(ref(db,"clientes/"+clienteKey+"/servicios"))
-cont.innerHTML="<h4>Historial de servicios</h4>"
+async function cargarServicios(clienteKey,vehiculoId){
+const cont=document.getElementById("servicios-"+vehiculoId)
+cont.innerHTML=""
+
+const snap=await get(ref(db,`clientes/${clienteKey}/vehiculos/${vehiculoId}/servicios`))
+
+cont.innerHTML="<h5>Historial de servicios</h5>"
+
+if(esAdmin){
+const btn=document.createElement("button")
+btn.innerText="Agregar Servicio"
+btn.style.marginBottom="10px"
+btn.onclick=()=>agregarServicio(clienteKey,vehiculoId)
+cont.appendChild(btn)
+}
 
 if(!snap.exists()){
 cont.innerHTML+="<p>No hay servicios registrados.</p>"
 return
 }
 
-const tabla=document.createElement("table")
-tabla.classList.add("tabla-servicios")
-tabla.innerHTML=`
-<thead>
-<tr>
-<th>Fecha</th>
-<th>Servicio</th>
-<th>Descripción</th>
-<th>Costo</th>
-<th>Estado</th>
-</tr>
-</thead>
-<tbody></tbody>
-`
-const tbody=tabla.querySelector("tbody")
+const servicios=[]
+snap.forEach(s=>servicios.push(s.val()))
 
-snap.forEach(s=>{
-const serv=s.val()
+servicios.sort((a,b)=>new Date(b.fecha)-new Date(a.fecha))
+
+servicios.forEach(serv=>{
 const estado=calcularEstado(serv.fecha)
-
-const fila=document.createElement("tr")
-fila.innerHTML=`
-<td>${serv.fecha}</td>
-<td>${serv.nombre}</td>
-<td>${serv.descripcion}</td>
-<td>$${serv.costo}</td>
-<td style="color:${estado.color};font-weight:600;">${estado.texto}</td>
-`
-tbody.appendChild(fila)
 
 const card=document.createElement("div")
 card.className="servicio-card"
-card.setAttribute("data-nombre",serv.nombre.toLowerCase())
-card.setAttribute("data-fecha",serv.fecha)
 
 card.innerHTML=`
 <h4>${serv.nombre}</h4>
-<small style="color:${estado.color};font-weight:600;">${serv.fecha} - ${estado.texto}</small>
-<small>🧾 ${serv.descripcion}</small>
-<b>💲 $${serv.costo}</b>
+<small style="color:${estado.color};font-weight:600;">
+${serv.fecha} - ${estado.texto}
+</small>
+<p>${serv.descripcion||""}</p>
+<b>$${serv.costo}</b>
 `
+
 cont.appendChild(card)
 })
-
-cont.appendChild(tabla)
-
-if(esAdmin&&fab){
-fab.style.display="block"
-fab.onclick=()=>agregarServicio(clienteKey)
-}
 }
 
-window.filtrarServicios=function(clienteKey,valor){
-valor=valor.toLowerCase()
-const cards=document.querySelectorAll(`#servicios-${clienteKey} .servicio-card`)
-cards.forEach(card=>{
-const nombre=card.getAttribute("data-nombre")
-const fecha=card.getAttribute("data-fecha")
-if(nombre.includes(valor)||fecha.includes(valor)){
-card.style.display="block"
-}else{
-card.style.display="none"
-}
-})
-}
-
-async function agregarServicio(clienteKey){
+async function agregarServicio(clienteKey,vehiculoId){
 const nombre=prompt("Nombre del servicio:")
 const fecha=prompt("Fecha (YYYY-MM-DD):")
 const descripcion=prompt("Descripción:")
 const costo=prompt("Costo:")
-if(!nombre||!fecha||!descripcion||!costo)return
+const kilometraje=prompt("Kilometraje actual:")
 
-await push(ref(db,"clientes/"+clienteKey+"/servicios"),{
-nombre,fecha,descripcion,costo
+if(!nombre||!fecha||!descripcion||!costo||!kilometraje)return
+
+await push(ref(db,`clientes/${clienteKey}/vehiculos/${vehiculoId}/servicios`),{
+nombre,fecha,descripcion,costo,kilometraje
 })
 
-cargarServicios(clienteKey)
+await update(ref(db,`clientes/${clienteKey}/vehiculos/${vehiculoId}`),{
+kilometraje
+})
+
+cargarServicios(clienteKey,vehiculoId)
 }
 
 function editarCliente(key,cliente){
 clienteEditandoKey=key
 document.getElementById("editNombre").value=cliente.nombre
 document.getElementById("editCorreo").value=cliente.email
-document.getElementById("editModelo").value=cliente.vehiculo.modelo
-document.getElementById("editPlaca").value=cliente.vehiculo.placa
-if(document.getElementById("editKilometraje"))
-document.getElementById("editKilometraje").value=cliente.vehiculo.kilometraje||""
-document.getElementById("editImagen").value=cliente.vehiculo.imagen
 document.getElementById("modalEditar").style.display="flex"
 }
 
@@ -265,15 +207,10 @@ if(!clienteEditandoKey)return
 
 const nombre=document.getElementById("editNombre").value.trim()
 const email=document.getElementById("editCorreo").value.trim()
-const modelo=document.getElementById("editModelo").value.trim()
-const placa=document.getElementById("editPlaca").value.trim()
-const kilometraje=document.getElementById("editKilometraje")?document.getElementById("editKilometraje").value.trim():""
-const imagen=document.getElementById("editImagen").value.trim()
 
 await update(ref(db,"clientes/"+clienteEditandoKey),{
 nombre,
-email,
-vehiculo:{modelo,placa,kilometraje,imagen}
+email
 })
 
 document.getElementById("modalEditar").style.display="none"
@@ -287,7 +224,7 @@ clienteEditandoKey=null
 }
 
 async function eliminarCliente(key){
-if(confirm("¿Eliminar este cliente y su historial?")){
+if(confirm("¿Eliminar este cliente y todos sus vehículos?")){
 await remove(ref(db,"clientes/"+key))
 cargarTodosClientes()
 }
