@@ -18,54 +18,61 @@
 
 <main class="container">
 
-<section id="panelAdmin">
+<!-- PANEL ADMIN -->
+<section id="panelAdmin" style="display:none;">
 <form id="adminForm">
 <h3>Registrar Cliente</h3>
+
 <input id="nombre" placeholder="Nombre completo" required>
 <input id="correo" type="email" placeholder="Correo" required>
 <input id="password" type="password" placeholder="Contraseña opcional">
-<input id="modelo" placeholder="Modelo vehículo" required>
-<input id="placa" placeholder="Placa" required>
-<input id="kilometraje" placeholder="Kilometraje actual" required>
-<input id="imagen" placeholder="Imagen opcional">
-<button type="button" onclick="altaCliente()">Guardar</button>
+
+<button type="button" onclick="altaCliente()">Guardar Cliente</button>
 </form>
 </section>
 
+<!-- CONTENIDO CLIENTES / VEHÍCULOS -->
 <section id="contenido"></section>
 
 </main>
 
+<!-- MODAL EDITAR CLIENTE -->
 <div id="modalEditar" class="modal">
 <div class="modal-content">
 <h3>Editar Cliente</h3>
+
 <form onsubmit="guardarEdicionCliente(event)">
 <input id="editNombre" placeholder="Nombre">
 <input id="editCorreo" placeholder="Correo">
-<input id="editModelo" placeholder="Modelo">
-<input id="editPlaca" placeholder="Placa">
-<input id="editKilometraje" placeholder="Kilometraje">
-<input id="editImagen" placeholder="Imagen">
+
 <div class="modal-actions">
 <button type="submit">Guardar</button>
 <button type="button" onclick="closeModal()">Cancelar</button>
 </div>
+
 </form>
 </div>
 </div>
 
+<!-- BOTONES FLOTANTES -->
 <div class="fab-container">
-<a href="https://wa.me/522228874920" target="_blank" class="fab whatsapp">
+
+<a href="https://wa.me/522228874920"
+target="_blank"
+class="fab whatsapp">
 <svg viewBox="0 0 448 512" fill="white">
 <path d="M380.9 97.1C339-3.1 206.2-33.3 115.1 8.6 24.1 50.5-6.2 183.3 35.7 274.3l-30.6 111 113.8-29.8c86.7 45.3 194.4 11.8 239.7-75 45.3-86.7 11.8-194.4-75-239.7z"/>
 </svg>
 </a>
 
-<a href="https://www.facebook.com/share/1CRG8xXNKz/" target="_blank" class="fab facebook">
+<a href="https://www.facebook.com/share/1CRG8xXNKz/"
+target="_blank"
+class="fab facebook">
 <svg viewBox="0 0 320 512" fill="white">
 <path d="M279.14 288l14.22-92.66h-88.91V117.78c0-25.35 12.42-50.06 52.24-50.06h40.42V6.26S260.43 0 225.36 0c-73.22 0-121.08 44.38-121.08 124.72v70.62H22.89V288h81.39v224h100.2V288z"/>
 </svg>
 </a>
+
 </div>
 
 <script type="module" src="perfil.js"></script>
